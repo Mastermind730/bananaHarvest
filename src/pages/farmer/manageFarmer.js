@@ -85,7 +85,7 @@ const ManageFarmer = () => {
           console.log(result);
           if (result["status"] === "success") {
             toast.success("Successfully added a new farmer");
-            navigate("/home");
+            navigate("/addCompany");
           } else {
             toast.error(result["error"]);
           }
