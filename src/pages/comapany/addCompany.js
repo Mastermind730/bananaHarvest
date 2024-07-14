@@ -5,7 +5,7 @@ import axios from "axios";
 import config from "../../config";
 import { useNavigate } from "react-router-dom";
 import { setSelectedTab } from "../features/handleUser";
-import { MaterialReactTable } from 'material-react-table';
+import { MRT_Table, useMaterialReactTable } from 'material-react-table';
 import {
   Box,
   Button,
@@ -177,6 +177,49 @@ const ManageCompany = () => {
     setIsModalOpen(false);
   };
 
+  const table = useMaterialReactTable({
+    columns,
+    data: company, // Assuming users is the array of data fetched
+    enableColumnActions: false,
+    enableColumnFilters: false,
+    enablePagination: false,
+    enableSorting: false,
+    mrtTheme: (theme) => ({
+      baseBackgroundColor: theme.palette.background.default,
+    }),
+    muiTableBodyRowProps: { hover: false },
+    muiTableProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        caption: {
+          captionSide: 'top',
+          fontSize: '1.2rem',
+          fontWeight: 'bold',
+        },
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        backgroundColor: '#f0f0f0',
+        color: '#333',
+        padding: '8px',
+        textAlign: 'center',
+      },
+    },
+    muiTableBodyCellProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        padding: '8px',
+        textAlign: 'center',
+      },
+    },
+    renderCaption: ({ table }) =>
+      `Table with ${table.getRowModel().rows.length} rows.`,
+  });
+
   return (
     <div style={{ padding: "20px" }}>
       <Typography variant="h6" gutterBottom>
@@ -295,12 +338,8 @@ const ManageCompany = () => {
       </Dialog>
 
       <Box>
-        <MaterialReactTable
-          data={company}
-          columns={columns}
-          editDisplayMode="modal"
-          enableEditing={true}
-        />
+      <MRT_Table table={table} />
+
       </Box>
     </div>
   );
