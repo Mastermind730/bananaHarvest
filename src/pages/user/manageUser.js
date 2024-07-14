@@ -23,6 +23,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify';
 import { setSelectedTab } from '../features/handleUser';
+import Unauthorized from '../../components/unauthorised';
 
 const ManageUser = () => {
   const [user_name, setUser_name] = useState('');
@@ -32,11 +33,11 @@ const ManageUser = () => {
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState([]);
 
-  const selectedTab = useSelector(
-    (state) => state?.HandleUser?.value?.selectedTab
-  );
+  const user = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const roles = ['ADMIN', 'SUPERVISOR', 'USER'];
+  const roles = ['ADMIN', 'SUPERVISOR', 'ACCOUNTANT'];
 
   const columns = useMemo(
     () => [
@@ -46,6 +47,7 @@ const ManageUser = () => {
     ],
     []
   );
+  
 
   useEffect(() => {
     const getUsers = async () => {
@@ -61,9 +63,16 @@ const ManageUser = () => {
     };
     getUsers();
   }, []);
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // Redirect to unauthorized page if the user is not an admin
+  useEffect(()=>{
+    if (!user || user.role !== 'ADMIN') {
+      // <Unauthorized />;
+      toast.error("Unauthorised Access")
+     navigate("/home")
+     // return <Unauthorized />;
+   }
+  })
+ 
 
   const AddUser = () => {
     if (user_name.length === 0) {
@@ -88,13 +97,12 @@ const ManageUser = () => {
         })
         .then((response) => {
           const result = response.data;
-          console.log(result)
-          if (result['status'] === 'success') {
+          if (result.status === 'success') {
             toast.success('Successfully added a new user');
             navigate('/manageUser');
             setOpen(false);
           } else {
-            toast.error(result['error']);
+            toast.error(result.error);
           }
         })
         .catch((error) => {
@@ -116,6 +124,8 @@ const ManageUser = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  
 
   return (
     <Box p={2}>

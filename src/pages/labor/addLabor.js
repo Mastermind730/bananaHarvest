@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import Input from "../../components/input";
 import Button from "../../components/button";
 import { toast } from "react-toastify";
-import {  useDispatch } from "react-redux";
+import {  useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import config from "../../config";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +24,8 @@ const ManageLabor = () => {
   const [contractor_mobile, setContractor_mobile] = useState("");
   const [open, setOpen] = useState(false);
   const [labors, setLabors] = useState([]);
+  const user = useSelector((state) => state.user);
+
 
 
 
@@ -49,6 +51,15 @@ const ManageLabor = () => {
     }
     getLabors();
 
+  })
+  // Redirect to unauthorized page if the user is not an admin
+  useEffect(()=>{
+    if (!user || user.role !== 'ADMIN' || user.role !== 'SUPERVISOR') {
+      // <Unauthorized />;
+      toast.error("Unauthorised Access")
+     navigate("/home")
+     // return <Unauthorized />;
+   }
   })
 
 

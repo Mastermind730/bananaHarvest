@@ -34,6 +34,8 @@ const ManageCompany = () => {
   const [charges, setCharges] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [company, setCompany] = useState([]);
+  const user = useSelector((state) => state.user);
+
   const selectedTab = useSelector(
     (state) => state?.HandleUser?.value?.selectedTab
   );
@@ -86,6 +88,15 @@ const ManageCompany = () => {
       ),
     },
   ], [openDeleteConfirmModal]);
+  // Redirect to unauthorized page if the user is not an admin
+  useEffect(()=>{
+    if (!user || user.role !== 'ADMIN'  || user.role !=="SUPERVISOR") {
+      // <Unauthorized />;
+      toast.error("Unauthorised Access")
+     navigate("/home")
+     // return <Unauthorized />;
+   }
+  })
 
   const AddCompany = () => {
     if (companyName.length === 0) {

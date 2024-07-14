@@ -1,43 +1,44 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
 
-// create an auth slice to maintain the user signin status
+// Create an auth slice to maintain the user signin status
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    // user is not logged in
-    status: false,
+    status: false, // User is not logged in
+    user: null, // User object to store user information including role
   },
   reducers: {
     signin: (state, action) => {
-      // the user is now signed in
-      state.status = true
+      // The user is now signed in
+      state.status = true;
+      state.user = action.payload;
 
-    
-      sessionStorage['token'] = action.payload['token']
-      sessionStorage['userid'] = action.payload['userid']
-      sessionStorage['first_name'] = action.payload['first_name']
-      sessionStorage['last_name'] = action.payload['last_name']
-      sessionStorage['mobile_no'] = action.payload['mobile_no']
-      sessionStorage['role'] = action.payload['role'] 
-
+      // Save user information in sessionStorage
+      sessionStorage.setItem('token', action.payload.token);
+      sessionStorage.setItem('userid', action.payload.userid);
+      sessionStorage.setItem('first_name', action.payload.first_name);
+      sessionStorage.setItem('last_name', action.payload.last_name);
+      sessionStorage.setItem('mobile_no', action.payload.mobile_no);
+      sessionStorage.setItem('role', action.payload.role);
     },
-    signout: (state, action) => {
-      // the user is signed out
-      state.status = false
+    signout: (state) => {
+      // The user is signed out
+      state.status = false;
+      state.user = null;
 
-      // remove the user token and name from sessionStorage
-      sessionStorage.removeItem('token')
-      sessionStorage.removeItem('userid')
-      sessionStorage.removeItem('first_name')
-      sessionStorage.removeItem('last_name')
-      sessionStorage.removeItem('mobile_no')
-      sessionStorage.removeItem('role')
+      // Remove user information from sessionStorage
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('userid');
+      sessionStorage.removeItem('first_name');
+      sessionStorage.removeItem('last_name');
+      sessionStorage.removeItem('mobile_no');
+      sessionStorage.removeItem('role');
     },
   },
-})
+});
 
-// export the reducer for authSlice
-export default authSlice.reducer
+// Export the reducer for authSlice
+export default authSlice.reducer;
 
-// export the actions
-export const { signin, signout } = authSlice.actions
+// Export the actions
+export const { signin, signout } = authSlice.actions;

@@ -43,6 +43,7 @@ const ManageFarmer = () => {
   const [boxTypes, setBoxTypes] = useState([{ boxKgType: "", emptyBoxWeight: "", boxCount: "", boxName: "" }]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [farmers, setFarmers] = useState([]);
+  const user = useSelector((state) => state.user);
 
 
   const selectedTab = useSelector(
@@ -111,6 +112,16 @@ const ManageFarmer = () => {
     getFarmers();
   }, []);
   console.log(farmers)
+
+  // Redirect to unauthorized page if the user is not an admin
+  useEffect(()=>{
+    if (!user || user.role !== 'ADMIN' || user.role !== 'SUPERVISOR') {
+      // <Unauthorized />;
+      toast.error("Unauthorised Access")
+     navigate("/home")
+     // return <Unauthorized />;
+   }
+  })
   const openDeleteConfirmModal = useCallback(async (row) => {
     // if (window.confirm('Are you sure you want to delete this farmer?')) {
       
