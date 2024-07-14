@@ -33,11 +33,11 @@ const ManageUser = () => {
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState([]);
 
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const roles = ['ADMIN', 'SUPERVISOR', 'USER'];
+  const roles = ['ADMIN', 'SUPERVISOR', 'ACCOUNTANT'];
 
   const columns = useMemo(
     () => [
@@ -47,6 +47,7 @@ const ManageUser = () => {
     ],
     []
   );
+  
 
   useEffect(() => {
     const getUsers = async () => {
@@ -114,10 +115,7 @@ const ManageUser = () => {
     setOpen(false);
   };
 
-  // Redirect to unauthorized page if the user is not an admin
-  if (!user || user.role !== 'ADMIN') {
-    return <Unauthorized />;
-  }
+
 
   return (
     <Box p={2}>
