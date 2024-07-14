@@ -64,6 +64,15 @@ const ManageUser = () => {
     getUsers();
   }, []);
 
+   // Redirect to unauthorized page if the user is not an admin
+   useEffect(()=>{
+    if (!user || user.role !== 'ADMIN') {
+      // <Unauthorized />;
+      toast.error("Unauthorised Access")
+     navigate("/home")
+     // return <Unauthorized />;
+   }
+
   const AddUser = () => {
     if (user_name.length === 0) {
       toast.error('Enter first name');
