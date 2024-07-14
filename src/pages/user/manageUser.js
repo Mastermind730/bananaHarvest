@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
-import config from "../../config";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import config from '../../config';
+import { useNavigate } from 'react-router-dom';
 import { MaterialReactTable } from 'material-react-table';
 import {
+  Grid,
   Box,
   Button,
   Dialog,
@@ -14,51 +15,63 @@ import {
   IconButton,
   Tooltip,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { toast } from "react-toastify";
-import { setSelectedTab } from "../features/handleUser";
+import { toast } from 'react-toastify';
+import { setSelectedTab } from '../features/handleUser';
+import Unauthorized from '../../components/unauthorised';
 
 const ManageUser = () => {
-  const [user_name, setUser_name] = useState("");
-  const [mobile_no, setMobile_no] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [user_name, setUser_name] = useState('');
+  const [mobile_no, setMobile_no] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [open, setOpen] = useState(false);
+  const [users, setUsers] = useState([]);
 
-  const selectedTab = useSelector(
-    (state) => state?.HandleUser?.value?.selectedTab
-  );
-
-  const data = [
-    { id: 1, name: "Item 1" },
-    { id: 2, name: "Item 2" },
-    { id: 3, name: "Item 3" },
-  ];
-
-  const columns = useMemo(() => [
-    { accessorKey: "id", header: "ID" },
-    { accessorKey: "name", header: "Name" },
-  ], []);
-
-  const openDeleteConfirmModal = (row) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-     // deleteUser(row.original.id);
-    }
-  };
-
+  const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const roles = ['ADMIN', 'SUPERVISOR', 'USER'];
+
+  const columns = useMemo(
+    () => [
+      { accessorKey: 'user_name', header: 'User Name' },
+      { accessorKey: 'mobile_no', header: 'Mobile Number' },
+      { accessorKey: 'role', header: 'Role' },
+    ],
+    []
+  );
+
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const response = await axios.get(config.serverURL + '/harvest/users', {
+          headers: { token: sessionStorage['token'] },
+        });
+        const { data } = response.data;
+        setUsers(data); // Assuming data is an array of users
+      } catch (error) {
+        console.log('Error fetching users:', error);
+      }
+    };
+    getUsers();
+  }, []);
+
   const AddUser = () => {
     if (user_name.length === 0) {
-      toast.error("Enter first name");
+      toast.error('Enter first name');
     } else if (mobile_no.length === 0) {
-      toast.error("Enter mobile number");
+      toast.error('Enter mobile number');
     } else if (password.length === 0) {
-      toast.error("Enter password");
+      toast.error('Enter password');
     } else if (role.length === 0) {
-      toast.error("Enter role of user");
+      toast.error('Select role of user');
     } else {
       const body = {
         user_name,
@@ -68,22 +81,28 @@ const ManageUser = () => {
       };
 
       axios
-        .post(config.serverURL + "/harvest/users/add", body, {
-          headers: { token: sessionStorage["token"] },
+        .post(config.serverURL + '/harvest/users/add', body, {
+          headers: { token: sessionStorage['token'] },
         })
         .then((response) => {
           const result = response.data;
-          if (result["status"] === "success") {
-            toast.success("Successfully added a new user");
-            navigate("/home");
+          if (result.status === 'success') {
+            toast.success('Successfully added a new user');
+            navigate('/manageUser');
             setOpen(false);
           } else {
-            toast.error(result["error"]);
+            toast.error(result.error);
           }
         })
         .catch((error) => {
           console.log(error);
         });
+    }
+  };
+
+  const openDeleteConfirmModal = (row) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      // deleteUser(row.original.id);
     }
   };
 
@@ -95,20 +114,25 @@ const ManageUser = () => {
     setOpen(false);
   };
 
+  // Redirect to unauthorized page if the user is not an admin
+  if (!user || user.role !== 'ADMIN') {
+    return <Unauthorized />;
+  }
+
   return (
-    <div>
-      <div className="row">
-        <div className="col-12">
+    <Box p={2}>
+      <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+        <Grid item>
+          <Button variant="contained" color="primary" onClick={handleClickOpen}>
+            Add User
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
           <MaterialReactTable
-            data={data}
+            data={users}
             columns={columns}
             editDisplayMode="modal"
             enableEditing={true}
-            renderTopToolbarCustomActions={() => (
-              <Button variant="contained" color="primary" onClick={handleClickOpen}>
-                Add User
-              </Button>
-            )}
             renderRowActions={({ row, table }) => (
               <Box sx={{ display: 'flex', gap: '1rem' }}>
                 <Tooltip title="Delete">
@@ -119,44 +143,57 @@ const ManageUser = () => {
               </Box>
             )}
           />
-        </div>
-      </div>
-      <Dialog open={open} onClose={handleClose}>
+        </Grid>
+      </Grid>
+      <Dialog open={open} onClose={handleClose} fullWidth>
         <DialogTitle>Add User</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="First Name"
-            type="text"
-            fullWidth
-            value={user_name}
-            onChange={(e) => setUser_name(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Mobile Number"
-            type="number"
-            fullWidth
-            value={mobile_no}
-            onChange={(e) => setMobile_no(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Password"
-            type="password"
-            fullWidth
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Role"
-            type="text"
-            fullWidth
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          />
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="First Name"
+                type="text"
+                fullWidth
+                value={user_name}
+                onChange={(e) => setUser_name(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                label="Mobile Number"
+                type="number"
+                fullWidth
+                value={mobile_no}
+                onChange={(e) => setMobile_no(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                label="Password"
+                type="password"
+                fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel>Role</InputLabel>
+                <Select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                >
+                  {roles.map((role) => (
+                    <MenuItem key={role} value={role}>{role}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
@@ -167,7 +204,7 @@ const ManageUser = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 

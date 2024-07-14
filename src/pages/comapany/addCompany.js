@@ -5,16 +5,14 @@ import axios from "axios";
 import config from "../../config";
 import { useNavigate } from "react-router-dom";
 import { setSelectedTab } from "../features/handleUser";
-import { MaterialReactTable } from 'material-react-table';
+import { MRT_Table, useMaterialReactTable } from 'material-react-table';
 import {
   Box,
   Button,
   IconButton,
-  Tooltip,
   TextField,
   Grid,
   Typography,
-  Paper,
   Dialog,
   DialogActions,
   DialogContent,
@@ -40,25 +38,8 @@ const ManageCompany = () => {
     (state) => state?.HandleUser?.value?.selectedTab
   );
 
-
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  
-
-  // const deleteCompany = async (companyId) => {
-  //   try {
-  //     await axios.delete(`${config.serverURL}/harvest/company/${companyId}`, {
-  //       headers: { token: sessionStorage["token"] },
-  //     });
-  //     toast.success("Company deleted successfully");
-  //     setCompany((prevCompanies) => prevCompanies.filter(c => c.company_id !== companyId));
-  //   } catch (error) {
-  //     console.log(error);
-  //     toast.error("Failed to delete company");
-  //   }
-  // };
 
   useEffect(() => {
     const getCompanies = async () => {
@@ -67,7 +48,6 @@ const ManageCompany = () => {
           headers: { token: sessionStorage["token"] },
         });
         const result = response.data;
-        console.log(result.data);
         setCompany(result.data);
       } catch (error) {
         console.log(error);
@@ -76,29 +56,16 @@ const ManageCompany = () => {
     getCompanies();
   }, []);
 
-  console.log(company);
-
   const openDeleteConfirmModal = useCallback(async (row) => {
-    // if (window.confirm('Are you sure you want to delete this farmer?')) {
-      
-
-      try {
-        console.log((company[row.index]).company_name);
-        const response = await axios.delete(config.serverURL + `/harvest/company/${(company[row.index]).company_name}`, {
-          headers: { token: sessionStorage["token"] },
-        });
-        console.log(response);
-        // console.log(farmers[row.original.id].mobile_no);
-        setCompany(prevCompanies => prevCompanies.filter(item => item.company_name !== (company[row.index]).company_name));
-
-        // Update your state or handle response as needed
-        // setFarmers(response.data);
-      } catch (error) {
-        console.log('Error deleting company:', error);
-      }
-    // }
+    try {
+      const response = await axios.delete(config.serverURL + `/harvest/company/${company[row.index].company_name}`, {
+        headers: { token: sessionStorage["token"] },
+      });
+      setCompany(prevCompanies => prevCompanies.filter(item => item.company_name !== company[row.index].company_name));
+    } catch (error) {
+      console.log('Error deleting company:', error);
+    }
   }, [company]);
-
 
   const columns = useMemo(() => [
     { accessorKey: "company_name", header: "Company Name" ,size:200},
@@ -109,7 +76,6 @@ const ManageCompany = () => {
     { accessorKey: "payment_relatedperson", header: "Payment Person",size:200 },
     { accessorKey: "payment_relatedpersoncontact", header: "Payment Person Contact",size:180 },
     { accessorKey: "GSTIN", header: "GSTIN",size:200 },
-    { accessorKey: "created_on", header: "Created On",size:200 },
     {
       accessorKey: "actions",
       header: "Actions",
@@ -147,26 +113,17 @@ const ManageCompany = () => {
         })
         .then((response) => {
           const result = response.data;
-          console.log(result);
-          if (result["status"] === "success") {
+          if (result.status === "success") {
             toast.success("Successfully added a new company");
             navigate("/addCompany");
           } else {
-            toast.error(result["error"]);
+            toast.error(result.error);
           }
         })
         .catch((error) => {
           console.log(error);
         });
     }
-  };
-
-  const AddCompanyData = () => {
-    dispatch(setSelectedTab("AddCompany"));
-  };
-
-  const ShowList = () => {
-    dispatch(setSelectedTab("ShowList"));
   };
 
   const handleModalOpen = () => {
@@ -177,11 +134,51 @@ const ManageCompany = () => {
     setIsModalOpen(false);
   };
 
+  const table = useMaterialReactTable({
+    columns,
+    data: company,
+    enableColumnActions: false,
+    enableColumnFilters: false,
+    enablePagination: false,
+    enableSorting: false,
+    mrtTheme: (theme) => ({
+      baseBackgroundColor: theme.palette.background.default,
+    }),
+    muiTableBodyRowProps: { hover: false },
+    muiTableProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        caption: {
+          captionSide: 'top',
+          fontSize: '1.2rem',
+          fontWeight: 'bold',
+        },
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        backgroundColor: '#f0f0f0',
+        color: '#333',
+        padding: '8px',
+        textAlign: 'center',
+      },
+    },
+    muiTableBodyCellProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        padding: '8px',
+        textAlign: 'center',
+      },
+    },
+    renderCaption: ({ table }) =>
+      `Table with ${table.getRowModel().rows.length} rows.`,
+  });
+
   return (
-    <div style={{ padding: "20px" }}>
-      <Typography variant="h6" gutterBottom>
-        Manage Companies
-      </Typography>
+    <Box p={1}> 
 
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button variant="contained" color="primary" onClick={handleModalOpen}>
@@ -189,7 +186,7 @@ const ManageCompany = () => {
         </Button>
       </Box>
 
-      <Dialog open={isModalOpen} onClose={handleModalClose}>
+      <Dialog open={isModalOpen} onClose={handleModalClose} fullWidth>
         <DialogTitle>Add Company</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
@@ -294,15 +291,10 @@ const ManageCompany = () => {
         </DialogActions>
       </Dialog>
 
-      <Box>
-        <MaterialReactTable
-          data={company}
-          columns={columns}
-          editDisplayMode="modal"
-          enableEditing={true}
-        />
+      <Box sx={{ overflowX: 'auto' }}>
+        <MRT_Table table={table} />
       </Box>
-    </div>
+    </Box>
   );
 };
 
