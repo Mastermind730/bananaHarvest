@@ -3,8 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import config from '../../config';
 import { useNavigate } from 'react-router-dom';
-import { MRT_Table, useMaterialReactTable } from 'material-react-table';
+import { MaterialReactTable } from 'material-react-table';
 import {
+  Grid,
   Box,
   Button,
   Dialog,
@@ -35,11 +36,10 @@ const ManageUser = () => {
     (state) => state?.HandleUser?.value?.selectedTab
   );
 
-  const roles = ['admin', 'supervisor', 'user'];
+  const roles = ['ADMIN', 'SUPERVISOR', 'USER'];
 
   const columns = useMemo(
     () => [
-      { accessorKey: 'id', header: 'ID' },
       { accessorKey: 'user_name', header: 'User Name' },
       { accessorKey: 'mobile_no', header: 'Mobile Number' },
       { accessorKey: 'role', header: 'Role' },
@@ -61,7 +61,6 @@ const ManageUser = () => {
     };
     getUsers();
   }, []);
-  console.log(users)
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -89,9 +88,10 @@ const ManageUser = () => {
         })
         .then((response) => {
           const result = response.data;
+          console.log(result)
           if (result['status'] === 'success') {
             toast.success('Successfully added a new user');
-            navigate('/home');
+            navigate('/manageUser');
             setOpen(false);
           } else {
             toast.error(result['error']);
@@ -117,96 +117,81 @@ const ManageUser = () => {
     setOpen(false);
   };
 
-  const table = useMaterialReactTable({
-    columns,
-    data: users, // Assuming users is the array of data fetched
-    enableColumnActions: false,
-    enableColumnFilters: false,
-    enablePagination: false,
-    enableSorting: false,
-    mrtTheme: (theme) => ({
-      baseBackgroundColor: theme.palette.background.default,
-    }),
-    muiTableBodyRowProps: { hover: false },
-    muiTableProps: {
-      sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        caption: {
-          captionSide: 'top',
-          fontSize: '1.2rem',
-          fontWeight: 'bold',
-        },
-      },
-    },
-    muiTableHeadCellProps: {
-      sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        fontStyle: 'italic',
-        fontWeight: 'bold',
-        backgroundColor: '#f0f0f0',
-        color: '#333',
-        padding: '8px',
-        textAlign: 'center',
-      },
-    },
-    muiTableBodyCellProps: {
-      sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        padding: '8px',
-        textAlign: 'center',
-      },
-    },
-    renderCaption: ({ table }) =>
-      `Table with ${table.getRowModel().rows.length} rows.`,
-  });
-
   return (
-    <div>
-      <div className="row">
-        {users.length===0?<p>No records to display.</p>:(<div className="col-lg-12 col-md-12 col-sm-12">
-          {users.length!==0&&<MRT_Table table={table} />}
-        </div>)}
-        
-      </div>
-      <Dialog open={open} onClose={handleClose}>
+    <Box p={2}>
+      <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+        <Grid item>
+          <Button variant="contained" color="primary" onClick={handleClickOpen}>
+            Add User
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <MaterialReactTable
+            data={users}
+            columns={columns}
+            editDisplayMode="modal"
+            enableEditing={true}
+            renderRowActions={({ row, table }) => (
+              <Box sx={{ display: 'flex', gap: '1rem' }}>
+                <Tooltip title="Delete">
+                  <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
+          />
+        </Grid>
+      </Grid>
+      <Dialog open={open} onClose={handleClose} fullWidth>
         <DialogTitle>Add User</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="User Name"
-            type="text"
-            fullWidth
-            value={user_name}
-            onChange={(e) => setUser_name(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Mobile Number"
-            type="number"
-            fullWidth
-            value={mobile_no}
-            onChange={(e) => setMobile_no(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Password"
-            type="password"
-            fullWidth
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <FormControl fullWidth>
-            <InputLabel>Role</InputLabel>
-            <Select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              {roles.map((role) => (
-                <MenuItem key={role} value={role}>{role}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="First Name"
+                type="text"
+                fullWidth
+                value={user_name}
+                onChange={(e) => setUser_name(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                label="Mobile Number"
+                type="number"
+                fullWidth
+                value={mobile_no}
+                onChange={(e) => setMobile_no(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                label="Password"
+                type="password"
+                fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel>Role</InputLabel>
+                <Select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                >
+                  {roles.map((role) => (
+                    <MenuItem key={role} value={role}>{role}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
@@ -217,7 +202,7 @@ const ManageUser = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 
