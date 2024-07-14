@@ -52,7 +52,7 @@ const FarmerBill = () => {
     navigate("/paymentDetails");
   };
 
-  const filteredData = farmerBill.filter(
+  const filteredData = farmerBill.length === 0 ? [] : farmerBill.filter(
     row =>
       row.Date.includes(filter) ||
       row.Vehicle_Number.toLowerCase().includes(filter.toLowerCase()) ||
@@ -60,6 +60,7 @@ const FarmerBill = () => {
       row.LabourTeam_Name.toLowerCase().includes(filter.toLowerCase()) ||
       row.Farmer_Name.toLowerCase().includes(filter.toLowerCase())
   );
+  
 
   return (
     <div style={{ padding: "20px" }}>
@@ -104,30 +105,38 @@ const FarmerBill = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredData.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{row.Date}</TableCell>
-                      <TableCell>{row.Vehicle_Number}</TableCell>
-                      <TableCell>{row.Company_Name}</TableCell>
-                      <TableCell>{row.LabourTeam_Name}</TableCell>
-                      <TableCell>{row.Farmer_Name}</TableCell>
-                      {showAdditionalColumns && (
-                        <>
-                          <TableCell>{row.Weight}</TableCell>
-                          <TableCell>{row.EmptyBox_weight}</TableCell>
-                          <TableCell>{row.Subtotal_Weight}</TableCell>
-                          <TableCell>{row.Wastage}</TableCell>
-                          <TableCell>{row.Net_Weight}</TableCell>
-                          <TableCell>{row.Total_Weight}</TableCell>
-                          <TableCell>{row.Rate}</TableCell>
-                          <TableCell>{row.Initial_Amount}</TableCell>
-                          <TableCell>{row.Labour_Transport}</TableCell>
-                          <TableCell>{row.Amount_Payable}</TableCell>
-                          <TableCell>{row.Main_Box}</TableCell>
-                        </>
-                      )}
+                  {farmerBill.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={showAdditionalColumns ? 12 : 5} align="center">
+                        No records to display
+                      </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    filteredData.map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{row.Date}</TableCell>
+                        <TableCell>{row.Vehicle_Number}</TableCell>
+                        <TableCell>{row.Company_Name}</TableCell>
+                        <TableCell>{row.LabourTeam_Name}</TableCell>
+                        <TableCell>{row.Farmer_Name}</TableCell>
+                        {showAdditionalColumns && (
+                          <>
+                            <TableCell>{row.Weight}</TableCell>
+                            <TableCell>{row.EmptyBox_weight}</TableCell>
+                            <TableCell>{row.Subtotal_Weight}</TableCell>
+                            <TableCell>{row.Wastage}</TableCell>
+                            <TableCell>{row.Net_Weight}</TableCell>
+                            <TableCell>{row.Total_Weight}</TableCell>
+                            <TableCell>{row.Rate}</TableCell>
+                            <TableCell>{row.Initial_Amount}</TableCell>
+                            <TableCell>{row.Labour_Transport}</TableCell>
+                            <TableCell>{row.Amount_Payable}</TableCell>
+                            <TableCell>{row.Main_Box}</TableCell>
+                          </>
+                        )}
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -152,6 +161,7 @@ const FarmerBill = () => {
       </Grid>
     </div>
   );
+  
 };
 
 export default FarmerBill;

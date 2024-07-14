@@ -6,7 +6,7 @@ import {  useDispatch } from "react-redux";
 import axios from "axios";
 import config from "../../config";
 import { useNavigate } from "react-router-dom";
-import { MaterialReactTable } from 'material-react-table';
+import { MRT_Table, useMaterialReactTable } from 'material-react-table';
 import {
   Box,
   IconButton,
@@ -140,6 +140,49 @@ console.log(labors)
     }
   };
 
+  const table = useMaterialReactTable({
+    columns,
+    data: labors, // Assuming users is the array of data fetched
+    enableColumnActions: false,
+    enableColumnFilters: false,
+    enablePagination: false,
+    enableSorting: false,
+    mrtTheme: (theme) => ({
+      baseBackgroundColor: theme.palette.background.default,
+    }),
+    muiTableBodyRowProps: { hover: false },
+    muiTableProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        caption: {
+          captionSide: 'top',
+          fontSize: '1.2rem',
+          fontWeight: 'bold',
+        },
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        backgroundColor: '#f0f0f0',
+        color: '#333',
+        padding: '8px',
+        textAlign: 'center',
+      },
+    },
+    muiTableBodyCellProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        padding: '8px',
+        textAlign: 'center',
+      },
+    },
+    renderCaption: ({ table }) =>
+      `Table with ${table.getRowModel().rows.length} rows.`,
+  });
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -153,8 +196,8 @@ console.log(labors)
             </IconButton>
           </Tooltip>
         </Box>
-        <MaterialReactTable data={labors} columns={columns} />
-      </Box>
+        <MRT_Table table={table} />
+        </Box>
 
       <Modal
         open={open}

@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
-import config from "../../config";
-import { useNavigate } from "react-router-dom";
-import { MaterialReactTable } from 'material-react-table';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import config from '../../config';
+import { useNavigate } from 'react-router-dom';
+import { MRT_Table, useMaterialReactTable } from 'material-react-table';
 import {
   Box,
   Button,
@@ -14,51 +14,67 @@ import {
   IconButton,
   Tooltip,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { toast } from "react-toastify";
-import { setSelectedTab } from "../features/handleUser";
+import { toast } from 'react-toastify';
+import { setSelectedTab } from '../features/handleUser';
 
 const ManageUser = () => {
-  const [user_name, setUser_name] = useState("");
-  const [mobile_no, setMobile_no] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [user_name, setUser_name] = useState('');
+  const [mobile_no, setMobile_no] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [open, setOpen] = useState(false);
+  const [users, setUsers] = useState([]);
 
   const selectedTab = useSelector(
     (state) => state?.HandleUser?.value?.selectedTab
   );
 
-  const data = [
-    { id: 1, name: "Item 1" },
-    { id: 2, name: "Item 2" },
-    { id: 3, name: "Item 3" },
-  ];
+  const roles = ['admin', 'supervisor', 'user'];
 
-  const columns = useMemo(() => [
-    { accessorKey: "id", header: "ID" },
-    { accessorKey: "name", header: "Name" },
-  ], []);
+  const columns = useMemo(
+    () => [
+      { accessorKey: 'id', header: 'ID' },
+      { accessorKey: 'user_name', header: 'User Name' },
+      { accessorKey: 'mobile_no', header: 'Mobile Number' },
+      { accessorKey: 'role', header: 'Role' },
+    ],
+    []
+  );
 
-  const openDeleteConfirmModal = (row) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-     // deleteUser(row.original.id);
-    }
-  };
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const response = await axios.get(config.serverURL + '/harvest/users', {
+          headers: { token: sessionStorage['token'] },
+        });
+        const { data } = response.data;
+        setUsers(data); // Assuming data is an array of users
+      } catch (error) {
+        console.log('Error fetching users:', error);
+      }
+    };
+    getUsers();
+  }, []);
+  console.log(users)
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const AddUser = () => {
     if (user_name.length === 0) {
-      toast.error("Enter first name");
+      toast.error('Enter first name');
     } else if (mobile_no.length === 0) {
-      toast.error("Enter mobile number");
+      toast.error('Enter mobile number');
     } else if (password.length === 0) {
-      toast.error("Enter password");
+      toast.error('Enter password');
     } else if (role.length === 0) {
-      toast.error("Enter role of user");
+      toast.error('Select role of user');
     } else {
       const body = {
         user_name,
@@ -68,22 +84,28 @@ const ManageUser = () => {
       };
 
       axios
-        .post(config.serverURL + "/harvest/users/add", body, {
-          headers: { token: sessionStorage["token"] },
+        .post(config.serverURL + '/harvest/users/add', body, {
+          headers: { token: sessionStorage['token'] },
         })
         .then((response) => {
           const result = response.data;
-          if (result["status"] === "success") {
-            toast.success("Successfully added a new user");
-            navigate("/home");
+          if (result['status'] === 'success') {
+            toast.success('Successfully added a new user');
+            navigate('/home');
             setOpen(false);
           } else {
-            toast.error(result["error"]);
+            toast.error(result['error']);
           }
         })
         .catch((error) => {
           console.log(error);
         });
+    }
+  };
+
+  const openDeleteConfirmModal = (row) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      // deleteUser(row.original.id);
     }
   };
 
@@ -95,31 +117,56 @@ const ManageUser = () => {
     setOpen(false);
   };
 
+  const table = useMaterialReactTable({
+    columns,
+    data: users, // Assuming users is the array of data fetched
+    enableColumnActions: false,
+    enableColumnFilters: false,
+    enablePagination: false,
+    enableSorting: false,
+    mrtTheme: (theme) => ({
+      baseBackgroundColor: theme.palette.background.default,
+    }),
+    muiTableBodyRowProps: { hover: false },
+    muiTableProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        caption: {
+          captionSide: 'top',
+          fontSize: '1.2rem',
+          fontWeight: 'bold',
+        },
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        backgroundColor: '#f0f0f0',
+        color: '#333',
+        padding: '8px',
+        textAlign: 'center',
+      },
+    },
+    muiTableBodyCellProps: {
+      sx: {
+        border: '1px solid rgba(81, 81, 81, .5)',
+        padding: '8px',
+        textAlign: 'center',
+      },
+    },
+    renderCaption: ({ table }) =>
+      `Table with ${table.getRowModel().rows.length} rows.`,
+  });
+
   return (
     <div>
       <div className="row">
-        <div className="col-12">
-          <MaterialReactTable
-            data={data}
-            columns={columns}
-            editDisplayMode="modal"
-            enableEditing={true}
-            renderTopToolbarCustomActions={() => (
-              <Button variant="contained" color="primary" onClick={handleClickOpen}>
-                Add User
-              </Button>
-            )}
-            renderRowActions={({ row, table }) => (
-              <Box sx={{ display: 'flex', gap: '1rem' }}>
-                <Tooltip title="Delete">
-                  <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            )}
-          />
-        </div>
+        {users.length===0?<p>No records to display.</p>:(<div className="col-lg-12 col-md-12 col-sm-12">
+          {users.length!==0&&<MRT_Table table={table} />}
+        </div>)}
+        
       </div>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add User</DialogTitle>
@@ -127,7 +174,7 @@ const ManageUser = () => {
           <TextField
             autoFocus
             margin="dense"
-            label="First Name"
+            label="User Name"
             type="text"
             fullWidth
             value={user_name}
@@ -149,14 +196,17 @@ const ManageUser = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <TextField
-            margin="dense"
-            label="Role"
-            type="text"
-            fullWidth
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          />
+          <FormControl fullWidth>
+            <InputLabel>Role</InputLabel>
+            <Select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              {roles.map((role) => (
+                <MenuItem key={role} value={role}>{role}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
