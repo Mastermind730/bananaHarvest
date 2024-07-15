@@ -50,7 +50,7 @@ const ManageUser = () => {
 
   useEffect(() => {
     // Redirect to unauthorized page if the user is not an admin
-    console.log(user)
+    // console.log(user)
     if (!user || user.role !== 'ADMIN') {
       navigate("/home");
       toast.error("Unauthorized Access");
@@ -88,7 +88,9 @@ const ManageUser = () => {
         password,
         role,
       };
-
+      if(Number(mobile_no)<0){
+        toast.error('Enter valid mobile number');
+      }
       axios
         .post(config.serverURL + '/harvest/users/add', body, {
           headers: { token: sessionStorage.getItem('token') },
