@@ -24,7 +24,7 @@ const ManageLabor = () => {
   const [contractor_mobile, setContractor_mobile] = useState("");
   const [open, setOpen] = useState(false);
   const [labors, setLabors] = useState([]);
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.authSlice.user.user);
 
 
 

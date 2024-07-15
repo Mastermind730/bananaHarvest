@@ -34,7 +34,7 @@ const ManageCompany = () => {
   const [charges, setCharges] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [company, setCompany] = useState([]);
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.authSlice.user.user);
 
   const selectedTab = useSelector(
     (state) => state?.HandleUser?.value?.selectedTab

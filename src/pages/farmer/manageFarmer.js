@@ -43,7 +43,7 @@ const ManageFarmer = () => {
   const [boxTypes, setBoxTypes] = useState([{ boxKgType: "", emptyBoxWeight: "", boxCount: "", boxName: "" }]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [farmers, setFarmers] = useState([]);
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.authSlice.user.user);
 
 
   const selectedTab = useSelector(
