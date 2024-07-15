@@ -90,7 +90,7 @@ const ManageCompany = () => {
   ], [openDeleteConfirmModal]);
   // Redirect to unauthorized page if the user is not an admin
   useEffect(()=>{
-    if (!user || user.role !== 'ADMIN'  || user.role !=="SUPERVISOR") {
+    if (!user || user.role !== 'ADMIN') {
       // <Unauthorized />;
       toast.error("Unauthorised Access")
      navigate("/home")
@@ -103,7 +103,37 @@ const ManageCompany = () => {
       toast.error("Enter company name");
     } else if (companyEmail.length === 0) {
       toast.error("Enter company email");
-    } else {
+    } else if (companyAddress.length === 0) {
+      toast.error("Enter company address");
+    }
+    else if (ownerName.length === 0) {
+      toast.error("Enter owner name");
+    }
+    else if (ownerMobile.length === 0  ||Number(ownerMobile)<0 ||ownerMobile.length!==10) {
+      toast.error("Enter valid mobile number");
+    }
+    else if (paymentPerson.length === 0) {
+      toast.error("Enter payment person name");
+    }
+    else if (paymentPersonContact.length === 0  ||paymentPersonContact.length<0 ||paymentPersonContact.length!==10) {
+      toast.error("Enter valid mobile number");
+    }
+    
+    else if (gstin.length === 0|| Number(gstin)<0) {
+      toast.error("Enter valid gstin");
+    }
+    else if (ownerPassword.length === 0) {
+      toast.error("Enter owner password");
+    }
+    else if (alias.length === 0) {
+      toast.error("Enter alias");
+    }
+    else if (charges.length === 0) {
+      toast.error("Enter  charges");
+    }else
+     {
+   
+
       const body = {
         companyName,
         companyAddress,
@@ -205,6 +235,10 @@ const ManageCompany = () => {
               <TextField
                 fullWidth
                 label="Company Name"
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
               />
@@ -221,6 +255,10 @@ const ManageCompany = () => {
               <TextField
                 fullWidth
                 label="Company Email"
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 value={companyEmail}
                 onChange={(e) => setCompanyEmail(e.target.value)}
               />
@@ -230,6 +268,10 @@ const ManageCompany = () => {
                 fullWidth
                 label="Owner Name"
                 value={ownerName}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setOwnerName(e.target.value)}
               />
             </Grid>
@@ -238,6 +280,10 @@ const ManageCompany = () => {
                 fullWidth
                 label="Owner Mobile No"
                 value={ownerMobile}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setOwnerMobile(e.target.value)}
               />
             </Grid>
@@ -246,6 +292,10 @@ const ManageCompany = () => {
                 fullWidth
                 label="Payment Related Person"
                 value={paymentPerson}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setPaymentPerson(e.target.value)}
               />
             </Grid>
@@ -254,6 +304,10 @@ const ManageCompany = () => {
                 fullWidth
                 label="Payment Person Contact"
                 value={paymentPersonContact}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setPaymentPersonContact(e.target.value)}
               />
             </Grid>
@@ -262,6 +316,10 @@ const ManageCompany = () => {
                 fullWidth
                 label="GSTIN"
                 value={gstin}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setGstin(e.target.value)}
               />
             </Grid>
@@ -271,6 +329,10 @@ const ManageCompany = () => {
                 label="Owner's Password"
                 type="password"
                 value={ownerPassword}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setOwnerPassword(e.target.value)}
               />
             </Grid>
@@ -279,6 +341,10 @@ const ManageCompany = () => {
                 fullWidth
                 label="Alias"
                 value={alias}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setAlias(e.target.value)}
               />
             </Grid>
@@ -287,6 +353,10 @@ const ManageCompany = () => {
                 fullWidth
                 label="Charges"
                 value={charges}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setCharges(e.target.value)}
               />
             </Grid>

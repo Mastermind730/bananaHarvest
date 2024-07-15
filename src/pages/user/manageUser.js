@@ -75,8 +75,8 @@ const ManageUser = () => {
   const AddUser = () => {
     if (user_name.length === 0) {
       toast.error('Enter first name');
-    } else if (mobile_no.length === 0) {
-      toast.error('Enter mobile number');
+    } else if (mobile_no.length === 0 || mobile_no.length!==10 ||mobile_no.length<0) {
+      toast.error('Enter valid mobile number');
     } else if (password.length === 0) {
       toast.error('Enter password');
     } else if (role.length === 0) {
@@ -164,6 +164,10 @@ const ManageUser = () => {
                 type="text"
                 fullWidth
                 value={user_name}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setUser_name(e.target.value)}
               />
             </Grid>
@@ -174,6 +178,10 @@ const ManageUser = () => {
                 type="number"
                 fullWidth
                 value={mobile_no}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setMobile_no(e.target.value)}
               />
             </Grid>
@@ -184,12 +192,17 @@ const ManageUser = () => {
                 type="password"
                 fullWidth
                 value={password}
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth margin="dense">
                 <InputLabel>Role</InputLabel>
+                
                 <Select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}

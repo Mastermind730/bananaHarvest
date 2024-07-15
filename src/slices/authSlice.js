@@ -1,12 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Create an auth slice to maintain the user signin status
+// Retrieve user information from sessionStorage
+const token = sessionStorage.getItem('token');
+const userid = sessionStorage.getItem('userid');
+const firstName = sessionStorage.getItem('first_name');
+const lastName = sessionStorage.getItem('last_name');
+const mobileNo = sessionStorage.getItem('mobile_no');
+const role = sessionStorage.getItem('role');
+
+const initialState = {
+  status: !!token, // User is logged in if token exists
+  user: token ? {
+    token,
+    userid,
+    first_name: firstName,
+    last_name: lastName,
+    mobile_no: mobileNo,
+    role,
+  } : null,
+};
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    status: false, // User is not logged in
-    user: null, // User object to store user information including role
-  },
+  initialState,
   reducers: {
     signin: (state, action) => {
       // The user is now signed in
