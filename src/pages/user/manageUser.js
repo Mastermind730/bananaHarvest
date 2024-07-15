@@ -23,8 +23,8 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify';
 import { setSelectedTab } from '../features/handleUser';
-import Unauthorized from '../../components/unauthorised';
-
+// import Unauthorized from '../../components/unauthorised';
+// 
 const ManageUser = () => {
   const [user_name, setUser_name] = useState('');
   const [mobile_no, setMobile_no] = useState('');
@@ -33,7 +33,7 @@ const ManageUser = () => {
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState([]);
 
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.authSlice.user.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -47,13 +47,21 @@ const ManageUser = () => {
     ],
     []
   );
-  
+
+  useEffect(() => {
+    // Redirect to unauthorized page if the user is not an admin
+    console.log(user)
+    if (!user || user.role !== 'ADMIN') {
+      navigate("/home");
+      toast.error("Unauthorized Access");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     const getUsers = async () => {
       try {
         const response = await axios.get(config.serverURL + '/harvest/users', {
-          headers: { token: sessionStorage['token'] },
+          headers: { token: sessionStorage.getItem('token') },
         });
         const { data } = response.data;
         setUsers(data); // Assuming data is an array of users
@@ -63,15 +71,6 @@ const ManageUser = () => {
     };
     getUsers();
   }, []);
-
-   // Redirect to unauthorized page if the user is not an admin
-   useEffect(()=>{
-    if (!user || user.role !== 'ADMIN') {
-      // <Unauthorized />;
-      toast.error("Unauthorised Access")
-     navigate("/home")
-     // return <Unauthorized />;
-   }
 
   const AddUser = () => {
     if (user_name.length === 0) {
@@ -92,7 +91,7 @@ const ManageUser = () => {
 
       axios
         .post(config.serverURL + '/harvest/users/add', body, {
-          headers: { token: sessionStorage['token'] },
+          headers: { token: sessionStorage.getItem('token') },
         })
         .then((response) => {
           const result = response.data;
@@ -112,7 +111,8 @@ const ManageUser = () => {
 
   const openDeleteConfirmModal = (row) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
-      // deleteUser(row.original.id);
+      // Perform delete action if confirmed
+      // Example: deleteUser(row.original.id);
     }
   };
 
@@ -123,8 +123,6 @@ const ManageUser = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
-
 
   return (
     <Box p={2}>
