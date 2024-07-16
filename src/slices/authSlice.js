@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 // Retrieve user information from sessionStorage
-const token = sessionStorage.getItem('token');
-const userid = sessionStorage.getItem('userid');
-const firstName = sessionStorage.getItem('first_name');
-const lastName = sessionStorage.getItem('last_name');
-const mobileNo = sessionStorage.getItem('mobile_no');
-const role = sessionStorage.getItem('role');
+const token = localStorage.getItem('token');
+const userid = localStorage.getItem('userid');
+const firstName = localStorage.getItem('first_name');
+const lastName = localStorage.getItem('last_name');
+const mobileNo = localStorage.getItem('mobile_no');
+const role = localStorage.getItem('role');
 
 const initialState = {
   status: !!token, // User is logged in if token exists
