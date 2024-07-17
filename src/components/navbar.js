@@ -34,7 +34,11 @@ const Navbar = () => {
 
         <div className={`collapse navbar-collapse ${isNavOpen ? 'show' : ''}`} id='navbarSupportedContent'>
           <ul className='navbar-nav mx-auto mb-2 mb-lg-0'>
-            <li className='nav-item'>
+           
+
+            {signinStatus && (
+              <>
+               <li className='nav-item'>
               <Link className='nav-link active text-center' to='/home'>
                 Home
               </Link>
@@ -59,9 +63,6 @@ const Navbar = () => {
                 Manage Labor
               </Link>
             </li>
-
-            {signinStatus && (
-              <>
                 <li className='nav-item'>
                   <Link className='nav-link active text-center' to='/my-homes'>
                     Farmers

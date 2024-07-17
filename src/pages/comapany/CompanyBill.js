@@ -10,7 +10,7 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material';
 import axios from "axios";
 import config from "../../config";
@@ -26,7 +26,6 @@ const CompanyBill = () => {
           headers: { token: sessionStorage["token"] },
         });
         const result = response.data;
-        console.log(result.data);
         setCompanyBill(result.data);
       } catch (error) {
         console.log(error);
@@ -47,6 +46,10 @@ const CompanyBill = () => {
       row.LabourTeam_Name.toLowerCase().includes(filter.toLowerCase()) ||
       row.Farmer_Name.toLowerCase().includes(filter.toLowerCase())
   );
+
+  const getRowBackgroundColor = (index) => {
+    return index % 2 === 0 ? '#f0f0f0' : 'white'; // Alternating row colors
+  };
 
   return (
     <div style={{ padding: "20px" }}>
@@ -87,26 +90,34 @@ const CompanyBill = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredData.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{row.Date}</TableCell>
-                      <TableCell>{row.Vehicle_Number}</TableCell>
-                      <TableCell>{row.Company_Name}</TableCell>
-                      <TableCell>{row.LabourTeam_Name}</TableCell>
-                      <TableCell>{row.Farmer_Name}</TableCell>
-                      <TableCell>{row.Weight}</TableCell>
-                      <TableCell>{row.EmptyBox_weight}</TableCell>
-                      <TableCell>{row.Subtotal_Weight}</TableCell>
-                      <TableCell>{row.Wastage}</TableCell>
-                      <TableCell>{row.Net_Weight}</TableCell>
-                      <TableCell>{row.Danda}</TableCell>
-                      <TableCell>{row.Total_Weight}</TableCell>
-                      <TableCell>{row.Rate}</TableCell>
-                      <TableCell>{row.Initial_Amount}</TableCell>
-                      <TableCell>{row.Labour_Transport}</TableCell>
-                      <TableCell>{row.Amount_Payable}</TableCell>
+                  {filteredData.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={16} align="center">
+                        No records to display
+                      </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    filteredData.map((row, index) => (
+                      <TableRow key={index} style={{ backgroundColor: getRowBackgroundColor(index) }}>
+                        <TableCell>{row.Date}</TableCell>
+                        <TableCell>{row.Vehicle_Number}</TableCell>
+                        <TableCell>{row.Company_Name}</TableCell>
+                        <TableCell>{row.LabourTeam_Name}</TableCell>
+                        <TableCell>{row.Farmer_Name}</TableCell>
+                        <TableCell>{row.Weight}</TableCell>
+                        <TableCell>{row.EmptyBox_weight}</TableCell>
+                        <TableCell>{row.Subtotal_Weight}</TableCell>
+                        <TableCell>{row.Wastage}</TableCell>
+                        <TableCell>{row.Net_Weight}</TableCell>
+                        <TableCell>{row.Danda}</TableCell>
+                        <TableCell>{row.Total_Weight}</TableCell>
+                        <TableCell>{row.Rate}</TableCell>
+                        <TableCell>{row.Initial_Amount}</TableCell>
+                        <TableCell>{row.Labour_Transport}</TableCell>
+                        <TableCell>{row.Amount_Payable}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

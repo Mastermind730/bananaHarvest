@@ -24,8 +24,9 @@ const ManageLabor = () => {
   const [contractor_mobile, setContractor_mobile] = useState("");
   const [open, setOpen] = useState(false);
   const [labors, setLabors] = useState([]);
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.authSlice.user.user);
 
+  const navigate = useNavigate();
 
 
 
@@ -53,14 +54,13 @@ const ManageLabor = () => {
 
   })
   // Redirect to unauthorized page if the user is not an admin
-  useEffect(()=>{
-    if (!user || user.role !== 'ADMIN' || user.role !== 'SUPERVISOR') {
-      // <Unauthorized />;
-      toast.error("Unauthorised Access")
-     navigate("/home")
-     // return <Unauthorized />;
-   }
-  })
+  useEffect(() => {
+    console.log(user);
+    if (!user || (user.role !== "ADMIN" && user.role !== "SUPERVISOR")) {
+      toast.error("Unauthorized Access");
+      navigate("/home");
+    }
+  }, [user, navigate]);
 
 
 //  console.log(labors)
@@ -111,7 +111,6 @@ console.log(labors)
 
 
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const AddLabor = () => {
@@ -199,7 +198,7 @@ console.log(labors)
 
   return (
     <div>
-      <Box sx={{ p: 3, maxWidth: 800, mx: "auto" }}>
+      <Box sx={{ p: 2, maxWidth: 1000, mx: "auto" }}>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           <Tooltip title="Add Labor">
             <IconButton color="primary" onClick={handleOpen}>
@@ -207,7 +206,9 @@ console.log(labors)
             </IconButton>
           </Tooltip>
         </Box>
+        <Box sx={{ overflowX: 'auto' }}>
         <MRT_Table table={table} />
+        </Box>
         </Box>
 
       <Modal
