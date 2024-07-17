@@ -5,8 +5,8 @@ import config from "../../config";
 import ToggleHeart from "../../components/toggleHeart";
 import { Link } from "react-router-dom";
 import "./styles.css";
-
 import SideBarButton from "../../components/sideBarBtton";
+
 const Home = () => {
   const [user_name, setUser_name] = useState('');
   const [mobile_no, setMobile_no] = useState('');
@@ -54,52 +54,49 @@ const Home = () => {
   };
 
   return (
-    <div className="row">
-  <div className="col-2">
-    <nav className="navbar navbar-expand-lg my_nav navbar-light bg-light shadow-md">
-      <div className="collapse navbar-collapse">
-        <ul className="navbar-nav flex-column gap-2 h-[100%]">
-          <li className="nav-item active">
-            <Link to={"/farmerBill"} className="nav-link custom-link">Farmer Bill</Link>
-          </li>
-          <li className="nav-item active">
-            <Link to={"/CompanyBill"} className="nav-link custom-link">Company Bill</Link>
-          </li>
-          <li className="nav-item active">
-            <button className="btn btn-link nav-link custom-link">Labor Bill</button>
-          </li>
-          <li className="nav-item active">
-            <button className="btn btn-link nav-link custom-link">Stock/Inventory</button>
-          </li>
-          <li className="nav-item active">
-            <button className="btn btn-link nav-link custom-link">Transport</button>
-          </li>
-          <li className="nav-item active">
-            <button className="btn btn-link nav-link custom-link">Audit</button>
-          </li>
-          <li className="nav-item active">
-            <button className="btn btn-link nav-link custom-link">Containers</button>
-          </li>
-          <li className="nav-item active">
-            <button className="btn btn-link nav-link custom-link">Others</button>
-          </li>
-          <li className="nav-item active">
-            <button className="btn btn-link nav-link custom-link">Setting</button>
-          </li>
-        </ul>
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-12 col-md-2 bg-light p-0">
+          <nav className="navbar navbar-expand-md navbar-light bg-light flex-md-column align-items-start py-2">
+            
+            <div className="collapse navbar-collapse" id="navbarNav">
+              <ul className="navbar-nav flex-column w-100 p-4">
+                <li className="nav-item">
+                  <Link to="/farmerBill" className="nav-link custom-link">Farmer Bill</Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/CompanyBill" className="nav-link custom-link">Company Bill</Link>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link custom-link">Labor Bill</button>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link custom-link">Stock/Inventory</button>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link custom-link">Transport</button>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link custom-link">Audit</button>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link custom-link">Containers</button>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link custom-link">Others</button>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link custom-link">Setting</button>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+        <div className="col-12 col-md-10 bg-gray-100 p-4">
+          <img src="/bg.jpg" alt="Harvest_image" className="img-fluid harvest_image" />
+        </div>
       </div>
-    </nav>
-  </div>
-
-  <div className="col-10 bg-gray-100 p-4">
-  
-  
-
-  <img src="/bg.jpg" alt="Harvest_image" className="harvest_image" />
-</div>
-
-</div>
-
+    </div>
   );
 };
 

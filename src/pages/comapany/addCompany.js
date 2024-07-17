@@ -89,14 +89,13 @@ const ManageCompany = () => {
     },
   ], [openDeleteConfirmModal]);
   // Redirect to unauthorized page if the user is not an admin
-  useEffect(()=>{
-    if (!user || user.role !== 'ADMIN') {
-      // <Unauthorized />;
-      toast.error("Unauthorised Access")
-     navigate("/home")
-     // return <Unauthorized />;
-   }
-  })
+  useEffect(() => {
+    console.log(user);
+    if (!user || (user.role !== "ADMIN" && user.role !== "SUPERVISOR")) {
+      toast.error("Unauthorized Access");
+      navigate("/home");
+    }
+  }, [user, navigate]);
 
   const AddCompany = () => {
     if (companyName.length === 0) {

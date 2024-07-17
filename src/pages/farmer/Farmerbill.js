@@ -11,12 +11,11 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import config from "../../config";
-
 
 const FarmerBill = () => {
   const [showAdditionalColumns, setShowAdditionalColumns] = useState(false);
@@ -31,7 +30,6 @@ const FarmerBill = () => {
           headers: { token: sessionStorage["token"] },
         });
         const result = response.data;
-        console.log(result.data);
         setFarmerBill(result.data);
       } catch (error) {
         console.log(error);
@@ -60,7 +58,10 @@ const FarmerBill = () => {
       row.LabourTeam_Name.toLowerCase().includes(filter.toLowerCase()) ||
       row.Farmer_Name.toLowerCase().includes(filter.toLowerCase())
   );
-  
+
+  const getRowBackgroundColor = (index) => {
+    return index % 2 === 0 ? '#f0f0f0' : 'white'; // Alternating row colors
+  };
 
   return (
     <div style={{ padding: "20px" }}>
@@ -113,7 +114,7 @@ const FarmerBill = () => {
                     </TableRow>
                   ) : (
                     filteredData.map((row, index) => (
-                      <TableRow key={index}>
+                      <TableRow key={index} style={{ backgroundColor: getRowBackgroundColor(index) }}>
                         <TableCell>{row.Date}</TableCell>
                         <TableCell>{row.Vehicle_Number}</TableCell>
                         <TableCell>{row.Company_Name}</TableCell>
@@ -161,7 +162,6 @@ const FarmerBill = () => {
       </Grid>
     </div>
   );
-  
 };
 
 export default FarmerBill;

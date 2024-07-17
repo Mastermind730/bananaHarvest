@@ -25,6 +25,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+
 const ManageFarmer = () => {
   const [date, setDate] = useState("");
   const [location, setLocation] = useState("");
@@ -117,34 +118,25 @@ const ManageFarmer = () => {
   console.log(farmers)
 
   // Redirect to unauthorized page if the user is not an admin
-  useEffect(()=>{
+  useEffect(() => {
     console.log(user);
-    if (!user || user.role !=="ADMIN" ) {
-      // <Unauthorized />;
-      toast.error("Unauthorised Access")
-     navigate("/home")
-     // return <Unauthorized />;
-   }
-  })
+    if (!user || (user.role !== "ADMIN" && user.role !== "SUPERVISOR")) {
+      toast.error("Unauthorized Access");
+      navigate("/home");
+    }
+  }, [user, navigate]);
+  
   const openDeleteConfirmModal = useCallback(async (row) => {
-    // if (window.confirm('Are you sure you want to delete this farmer?')) {
-      
-
-      try {
-        console.log((farmers[row.index]).mobile_no);
-        const response = await axios.get(config.serverURL + `/harvest/farmers/${(farmers[row.index]).mobile_no}`, {
-          headers: { token: sessionStorage["token"] },
-        });
-        console.log(response);
-        // console.log(farmers[row.original.id].mobile_no);
-        setFarmers(prevFarmers => prevFarmers.filter(farmer => farmer.mobile_no !== (farmers[row.index]).mobile_no));
-
-        // Update your state or handle response as needed
-        // setFarmers(response.data);
-      } catch (error) {
-        console.log('Error deleting farmer:', error);
-      }
-    // }
+    try {
+      console.log((farmers[row.index]).mobile_no);
+      const response = await axios.get(config.serverURL + `/harvest/farmers/${(farmers[row.index]).mobile_no}`, {
+        headers: { token: sessionStorage["token"] },
+      });
+      console.log(response);
+      setFarmers(prevFarmers => prevFarmers.filter(farmer => farmer.mobile_no !== (farmers[row.index]).mobile_no));
+    } catch (error) {
+      console.log('Error deleting farmer:', error);
+    }
   }, [farmers]);
 
   const columns = useMemo(() => [
@@ -188,7 +180,7 @@ const ManageFarmer = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data: farmers, // Assuming users is the array of data fetched
+    data: farmers,
     enableColumnActions: false,
     enableColumnFilters: false,
     enablePagination: false,
@@ -230,7 +222,7 @@ const ManageFarmer = () => {
   });
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="container mt-3">
       <Typography variant="h6" gutterBottom>
         Manage Farmers
       </Typography>
@@ -245,7 +237,7 @@ const ManageFarmer = () => {
         <DialogTitle>Add Farmer</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Date"
@@ -254,30 +246,30 @@ const ManageFarmer = () => {
                 onChange={(e) => setDate(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
-  <TextField
-    fullWidth
-    label="Location"
-    required
-    InputLabelProps={{
-      shrink: true,
-      style: { color: 'red' }, // Change label color to red
-    }}
-    onChange={(e) => setLocation(e.target.value)}
-  />
-</Grid>
-
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Location"
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: 'red' }, // Change label color to red
+                }}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Geolocation"
                 onChange={(e) => setGeolocation(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Farmer Name"
+                required
                 InputLabelProps={{
                   shrink: true,
                   style: { color: 'red' }, // Change label color to red
@@ -285,10 +277,11 @@ const ManageFarmer = () => {
                 onChange={(e) => setFarmerName(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Farmer Mobile No"
+                label="Farmer Mobile"
+                required
                 InputLabelProps={{
                   shrink: true,
                   style: { color: 'red' }, // Change label color to red
@@ -296,181 +289,135 @@ const ManageFarmer = () => {
                 onChange={(e) => setFarmerMobile(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Vehicle No"
+                label="Vehicle No."
                 onChange={(e) => setVehicleNo(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Labor Name"
                 onChange={(e) => setLaborName(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Company Name"
                 onChange={(e) => setCompanyName(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Rate"
                 onChange={(e) => setRate(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Weight"
                 onChange={(e) => setWeight(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Wastage"
                 onChange={(e) => setWastage(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Company Rate"
                 onChange={(e) => setCompanyRate(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Company Wastage"
                 onChange={(e) => setCompanyWastage(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Extra Payment"
                 onChange={(e) => setExtraPayment(e.target.value)}
               />
             </Grid>
-            {boxTypes.map((boxType, index) => (
-  <React.Fragment key={index}>
-    <Grid item xs={6}>
-      <InputLabel htmlFor={`boxKgType-${index}`}>Box</InputLabel>
-      <Select
-        fullWidth
-        value={boxType.boxKgType}
-        onChange={(e) => handleBoxTypeChange(index, 'boxKgType', e.target.value)}
-        inputProps={{
-          id: `boxKgType-${index}`,
-        }}
-      >
-        <MenuItem value=""><em>None</em></MenuItem>
-        <MenuItem value="3">3</MenuItem>
-        <MenuItem value="5">5</MenuItem>
-        <MenuItem value="7">7</MenuItem>
-        <MenuItem value="13">13</MenuItem>
-        <MenuItem value="13.5">13.5</MenuItem>
-        <MenuItem value="14">14</MenuItem>
-        <MenuItem value="16">16</MenuItem>
-        <MenuItem value="18">18</MenuItem>
-        <MenuItem value="custom">Custom</MenuItem>
-      </Select>
-    </Grid>
-    {boxType.boxKgType && boxType.boxKgType !== 'custom' && (
-      <>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Count"
-            value={boxType.boxCount}
-            onChange={(e) => handleBoxTypeChange(index, 'boxCount', e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Name"
-            value={boxType.boxName}
-            onChange={(e) => handleBoxTypeChange(index, 'boxName', e.target.value)}
-          />
-        </Grid>
-      </>
-    )}
-    {boxType.boxKgType === 'custom' && (
-      <>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Kg Type"
-            value={boxType.boxKgType}
-            onChange={(e) => handleBoxTypeChange(index, 'boxKgType', e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Empty Box Weight"
-            value={boxType.emptyBoxWeight}
-            onChange={(e) => handleBoxTypeChange(index, 'emptyBoxWeight', e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Count"
-            value={boxType.boxCount}
-            onChange={(e) => handleBoxTypeChange(index, 'boxCount', e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Name"
-            value={boxType.boxName}
-            onChange={(e) => handleBoxTypeChange(index, 'boxName', e.target.value)}
-          />
-        </Grid>
-      </>
-    )}
-    {index > 0 && (
-      <Grid item xs={6}>
-        <Tooltip title="Remove this box">
-          <IconButton color="secondary" onClick={() => handleRemoveBoxType(index)}>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      </Grid>
-    )}
-  </React.Fragment>
-))}
 
-            <Grid item xs={12}>
-              <Tooltip title="Add more boxes">
-                <IconButton color="primary" onClick={handleAddBoxType}>
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>
+            {boxTypes.map((boxType, index) => (
+              <React.Fragment key={index}>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    fullWidth
+                    label="Box Kg Type"
+                    value={boxType.boxKgType}
+                    onChange={(e) => handleBoxTypeChange(index, 'boxKgType', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    fullWidth
+                    label="Empty Box Weight"
+                    value={boxType.emptyBoxWeight}
+                    onChange={(e) => handleBoxTypeChange(index, 'emptyBoxWeight', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    fullWidth
+                    label="Box Count"
+                    value={boxType.boxCount}
+                    onChange={(e) => handleBoxTypeChange(index, 'boxCount', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    fullWidth
+                    label="Box Name"
+                    value={boxType.boxName}
+                    onChange={(e) => handleBoxTypeChange(index, 'boxName', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} className="d-flex justify-content-end">
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => handleRemoveBoxType(index)}
+                    className="mt-2"
+                  >
+                    Remove
+                  </Button>
+                </Grid>
+              </React.Fragment>
+            ))}
           </Grid>
+
+          <Box mt={2} display="flex" justifyContent="flex-end">
+            <Button variant="outlined" color="primary" onClick={handleAddBoxType}>
+              Add Box Type
+            </Button>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleModalClose} color="secondary">
             Cancel
           </Button>
           <Button onClick={AddFarmer} color="primary">
-            Add Farmer
+            Add
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Box>
+      <Box mt={3} sx={{ overflowX: 'auto' }}>
         <MRT_Table table={table} />
       </Box>
     </div>
