@@ -5,7 +5,7 @@ import axios from "axios";
 import config from "../../config";
 import { useNavigate } from "react-router-dom";
 import { setSelectedTab } from "../features/handleUser";
-import { MRT_Table, useMaterialReactTable } from 'material-react-table';
+import { MRT_Table, useMaterialReactTable } from "material-react-table";
 import {
   Box,
   Button,
@@ -17,8 +17,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ManageCompany = () => {
   const [companyName, setCompanyName] = useState("");
@@ -46,9 +46,12 @@ const ManageCompany = () => {
   useEffect(() => {
     const getCompanies = async () => {
       try {
-        const response = await axios.get(config.serverURL + "/harvest/company", {
-          headers: { token: sessionStorage["token"] },
-        });
+        const response = await axios.get(
+          config.serverURL + "/harvest/company",
+          {
+            headers: { token: localStorage["token"] },
+          }
+        );
         const result = response.data;
         setCompany(result.data);
       } catch (error) {
@@ -58,36 +61,58 @@ const ManageCompany = () => {
     getCompanies();
   }, []);
 
-  const openDeleteConfirmModal = useCallback(async (row) => {
-    try {
-      const response = await axios.delete(config.serverURL + `/harvest/company/${company[row.index].company_name}`, {
-        headers: { token: sessionStorage["token"] },
-      });
-      setCompany(prevCompanies => prevCompanies.filter(item => item.company_name !== company[row.index].company_name));
-    } catch (error) {
-      console.log('Error deleting company:', error);
-    }
-  }, [company]);
-
-  const columns = useMemo(() => [
-    { accessorKey: "company_name", header: "Company Name" ,size:200},
-    { accessorKey: "company_address", header: "Company Address",size:200 },
-    { accessorKey: "company_email", header: "Company Email",size:200 },
-    { accessorKey: "owner_name", header: "Owner Name",size:200 },
-    { accessorKey: "owner_mobile", header: "Owner Mobile",size:200 },
-    { accessorKey: "payment_relatedperson", header: "Payment Person",size:200 },
-    { accessorKey: "payment_relatedpersoncontact", header: "Payment Person Contact",size:180 },
-    { accessorKey: "GSTIN", header: "GSTIN",size:200 },
-    {
-      accessorKey: "actions",
-      header: "Actions",
-      Cell: ({ row }) => (
-        <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
-          <DeleteIcon />
-        </IconButton>
-      ),
+  const openDeleteConfirmModal = useCallback(
+    async (row) => {
+      try {
+        const response = await axios.delete(
+          config.serverURL +
+            `/harvest/company/${company[row.index].company_name}`,
+          {
+            headers: { token: localStorage["token"] },
+          }
+        );
+        setCompany((prevCompanies) =>
+          prevCompanies.filter(
+            (item) => item.company_name !== company[row.index].company_name
+          )
+        );
+      } catch (error) {
+        console.log("Error deleting company:", error);
+      }
     },
-  ], [openDeleteConfirmModal]);
+    [company]
+  );
+
+  const columns = useMemo(
+    () => [
+      { accessorKey: "company_name", header: "Company Name", size: 200 },
+      { accessorKey: "company_address", header: "Company Address", size: 200 },
+      { accessorKey: "company_email", header: "Company Email", size: 200 },
+      { accessorKey: "owner_name", header: "Owner Name", size: 200 },
+      { accessorKey: "owner_mobile", header: "Owner Mobile", size: 200 },
+      {
+        accessorKey: "payment_relatedperson",
+        header: "Payment Person",
+        size: 200,
+      },
+      {
+        accessorKey: "payment_relatedpersoncontact",
+        header: "Payment Person Contact",
+        size: 180,
+      },
+      { accessorKey: "GSTIN", header: "GSTIN", size: 200 },
+      {
+        accessorKey: "actions",
+        header: "Actions",
+        Cell: ({ row }) => (
+          <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
+            <DeleteIcon />
+          </IconButton>
+        ),
+      },
+    ],
+    [openDeleteConfirmModal]
+  );
   // Redirect to unauthorized page if the user is not an admin
   useEffect(() => {
     console.log(user);
@@ -104,35 +129,31 @@ const ManageCompany = () => {
       toast.error("Enter company email");
     } else if (companyAddress.length === 0) {
       toast.error("Enter company address");
-    }
-    else if (ownerName.length === 0) {
+    } else if (ownerName.length === 0) {
       toast.error("Enter owner name");
-    }
-    else if (ownerMobile.length === 0  ||Number(ownerMobile)<0 ||ownerMobile.length!==10) {
+    } else if (
+      ownerMobile.length === 0 ||
+      Number(ownerMobile) < 0 ||
+      ownerMobile.length !== 10
+    ) {
       toast.error("Enter valid mobile number");
-    }
-    else if (paymentPerson.length === 0) {
+    } else if (paymentPerson.length === 0) {
       toast.error("Enter payment person name");
-    }
-    else if (paymentPersonContact.length === 0  ||paymentPersonContact.length<0 ||paymentPersonContact.length!==10) {
+    } else if (
+      paymentPersonContact.length === 0 ||
+      paymentPersonContact.length < 0 ||
+      paymentPersonContact.length !== 10
+    ) {
       toast.error("Enter valid mobile number");
-    }
-    
-    else if (gstin.length === 0|| Number(gstin)<0) {
+    } else if (gstin.length === 0 || Number(gstin) < 0) {
       toast.error("Enter valid gstin");
-    }
-    else if (ownerPassword.length === 0) {
+    } else if (ownerPassword.length === 0) {
       toast.error("Enter owner password");
-    }
-    else if (alias.length === 0) {
+    } else if (alias.length === 0) {
       toast.error("Enter alias");
-    }
-    else if (charges.length === 0) {
+    } else if (charges.length === 0) {
       toast.error("Enter  charges");
-    }else
-     {
-   
-
+    } else {
       const body = {
         companyName,
         companyAddress,
@@ -146,10 +167,10 @@ const ManageCompany = () => {
         alias,
         charges,
       };
-      
+
       axios
         .post(config.serverURL + "/harvest/company/add", body, {
-          headers: { token: sessionStorage["token"] },
+          headers: { token: localStorage["token"] },
         })
         .then((response) => {
           const result = response.data;
@@ -187,30 +208,30 @@ const ManageCompany = () => {
     muiTableBodyRowProps: { hover: false },
     muiTableProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
+        border: "1px solid rgba(81, 81, 81, .5)",
         caption: {
-          captionSide: 'top',
-          fontSize: '1.2rem',
-          fontWeight: 'bold',
+          captionSide: "top",
+          fontSize: "1.2rem",
+          fontWeight: "bold",
         },
       },
     },
     muiTableHeadCellProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        fontStyle: 'italic',
-        fontWeight: 'bold',
-        backgroundColor: '#f0f0f0',
-        color: '#333',
-        padding: '8px',
-        textAlign: 'center',
+        border: "1px solid rgba(81, 81, 81, .5)",
+        fontStyle: "italic",
+        fontWeight: "bold",
+        backgroundColor: "#f0f0f0",
+        color: "#333",
+        padding: "8px",
+        textAlign: "center",
       },
     },
     muiTableBodyCellProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        padding: '8px',
-        textAlign: 'center',
+        border: "1px solid rgba(81, 81, 81, .5)",
+        padding: "8px",
+        textAlign: "center",
       },
     },
     renderCaption: ({ table }) =>
@@ -218,8 +239,7 @@ const ManageCompany = () => {
   });
 
   return (
-    <Box p={1}> 
-
+    <Box p={1}>
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button variant="contained" color="primary" onClick={handleModalOpen}>
           Add Company
@@ -236,7 +256,7 @@ const ManageCompany = () => {
                 label="Company Name"
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
@@ -256,7 +276,7 @@ const ManageCompany = () => {
                 label="Company Email"
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 value={companyEmail}
                 onChange={(e) => setCompanyEmail(e.target.value)}
@@ -269,7 +289,7 @@ const ManageCompany = () => {
                 value={ownerName}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setOwnerName(e.target.value)}
               />
@@ -281,7 +301,7 @@ const ManageCompany = () => {
                 value={ownerMobile}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setOwnerMobile(e.target.value)}
               />
@@ -293,7 +313,7 @@ const ManageCompany = () => {
                 value={paymentPerson}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setPaymentPerson(e.target.value)}
               />
@@ -305,7 +325,7 @@ const ManageCompany = () => {
                 value={paymentPersonContact}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setPaymentPersonContact(e.target.value)}
               />
@@ -317,7 +337,7 @@ const ManageCompany = () => {
                 value={gstin}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setGstin(e.target.value)}
               />
@@ -330,7 +350,7 @@ const ManageCompany = () => {
                 value={ownerPassword}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setOwnerPassword(e.target.value)}
               />
@@ -342,7 +362,7 @@ const ManageCompany = () => {
                 value={alias}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setAlias(e.target.value)}
               />
@@ -354,7 +374,7 @@ const ManageCompany = () => {
                 value={charges}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setCharges(e.target.value)}
               />
@@ -371,7 +391,7 @@ const ManageCompany = () => {
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ overflowX: 'auto' }}>
+      <Box sx={{ overflowX: "auto" }}>
         <MRT_Table table={table} />
       </Box>
     </Box>

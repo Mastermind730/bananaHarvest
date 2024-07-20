@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
-import config from '../../config';
-import { useNavigate } from 'react-router-dom';
-import { MaterialReactTable } from 'material-react-table';
+import React, { useState, useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import config from "../../config";
+import { useNavigate } from "react-router-dom";
+import { MaterialReactTable } from "material-react-table";
 import {
   Grid,
   Box,
@@ -19,54 +19,57 @@ import {
   InputLabel,
   Select,
   MenuItem,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { toast } from 'react-toastify';
-import { setSelectedTab } from '../features/handleUser';
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
+import { setSelectedTab } from "../features/handleUser";
 // import Unauthorized from '../../components/unauthorised';
-// 
+//
 const ManageUser = () => {
-  const [user_name, setUser_name] = useState('');
-  const [mobile_no, setMobile_no] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
+  const [user_name, setUser_name] = useState("");
+  const [mobile_no, setMobile_no] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState([]);
 
-  const user = useSelector((state) => state.authSlice.user.user);
+  const user = useSelector((state) => state.authSlice.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const roles = ['ADMIN', 'SUPERVISOR', 'ACCOUNTANT'];
+  const roles = ["ADMIN", "SUPERVISOR", "ACCOUNTANT"];
 
   const columns = useMemo(
     () => [
-      { accessorKey: 'user_name', header: 'User Name' },
-      { accessorKey: 'mobile_no', header: 'Mobile Number' },
-      { accessorKey: 'role', header: 'Role' },
+      { accessorKey: "user_name", header: "User Name" },
+      { accessorKey: "mobile_no", header: "Mobile Number" },
+      { accessorKey: "role", header: "Role" },
     ],
     []
   );
 
   useEffect(() => {
+    // console.log(user)
     // Redirect to unauthorized page if the user is not an admin
     // console.log(user)
-    if (!user || user.role !== 'ADMIN') {
+    if (!user || user.role !== "ADMIN") {
       navigate("/home");
       toast.error("Unauthorized Access");
     }
   }, [user, navigate]);
 
   useEffect(() => {
+    console.log(localStorage.getItem("token"));
     const getUsers = async () => {
       try {
-        const response = await axios.get(config.serverURL + '/harvest/users', {
-          headers: { token: sessionStorage.getItem('token') },
+        const response = await axios.get(config.serverURL + "/harvest/users", {
+          headers: { token: localStorage.getItem("token") },
         });
         const { data } = response.data;
+        console.log(data)
         setUsers(data); // Assuming data is an array of users
       } catch (error) {
-        console.log('Error fetching users:', error);
+        console.log("Error fetching users:", error);
       }
     };
     getUsers();
@@ -74,13 +77,17 @@ const ManageUser = () => {
 
   const AddUser = () => {
     if (user_name.length === 0) {
-      toast.error('Enter first name');
-    } else if (mobile_no.length === 0 || mobile_no.length!==10 ||mobile_no.length<0) {
-      toast.error('Enter valid mobile number');
+      toast.error("Enter first name");
+    } else if (
+      mobile_no.length === 0 ||
+      mobile_no.length !== 10 ||
+      mobile_no.length < 0
+    ) {
+      toast.error("Enter valid mobile number");
     } else if (password.length === 0) {
-      toast.error('Enter password');
+      toast.error("Enter password");
     } else if (role.length === 0) {
-      toast.error('Select role of user');
+      toast.error("Select role of user");
     } else {
       const body = {
         user_name,
@@ -88,18 +95,18 @@ const ManageUser = () => {
         password,
         role,
       };
-      if(Number(mobile_no)<0){
-        toast.error('Enter valid mobile number');
+      if (Number(mobile_no) < 0) {
+        toast.error("Enter valid mobile number");
       }
       axios
-        .post(config.serverURL + '/harvest/users/add', body, {
-          headers: { token: sessionStorage.getItem('token') },
+        .post(config.serverURL + "/harvest/users/add", body, {
+          headers: { token: localStorage.getItem("token") },
         })
         .then((response) => {
           const result = response.data;
-          if (result.status === 'success') {
-            toast.success('Successfully added a new user');
-            navigate('/manageUser');
+          if (result.status === "success") {
+            toast.success("Successfully added a new user");
+            navigate("/manageUser");
             setOpen(false);
           } else {
             toast.error(result.error);
@@ -112,7 +119,7 @@ const ManageUser = () => {
   };
 
   const openDeleteConfirmModal = (row) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+    if (window.confirm("Are you sure you want to delete this user?")) {
       // Perform delete action if confirmed
       // Example: deleteUser(row.original.id);
     }
@@ -128,7 +135,12 @@ const ManageUser = () => {
 
   return (
     <Box p={2}>
-      <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+      <Grid
+        container
+        spacing={2}
+        alignItems="center"
+        justifyContent="space-between"
+      >
         <Grid item>
           <Button variant="contained" color="primary" onClick={handleClickOpen}>
             Add User
@@ -141,9 +153,12 @@ const ManageUser = () => {
             editDisplayMode="modal"
             enableEditing={true}
             renderRowActions={({ row, table }) => (
-              <Box sx={{ display: 'flex', gap: '1rem' }}>
+              <Box sx={{ display: "flex", gap: "1rem" }}>
                 <Tooltip title="Delete">
-                  <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
+                  <IconButton
+                    color="error"
+                    onClick={() => openDeleteConfirmModal(row)}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </Tooltip>
@@ -166,7 +181,7 @@ const ManageUser = () => {
                 value={user_name}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setUser_name(e.target.value)}
               />
@@ -180,7 +195,7 @@ const ManageUser = () => {
                 value={mobile_no}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setMobile_no(e.target.value)}
               />
@@ -194,7 +209,7 @@ const ManageUser = () => {
                 value={password}
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -202,13 +217,12 @@ const ManageUser = () => {
             <Grid item xs={12}>
               <FormControl fullWidth margin="dense">
                 <InputLabel>Role</InputLabel>
-                
-                <Select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
+
+                <Select value={role} onChange={(e) => setRole(e.target.value)}>
                   {roles.map((role) => (
-                    <MenuItem key={role} value={role}>{role}</MenuItem>
+                    <MenuItem key={role} value={role}>
+                      {role}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>

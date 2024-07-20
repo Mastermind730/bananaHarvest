@@ -11,7 +11,7 @@ import {
   TableRow,
   TextField,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 import axios from "axios";
 import config from "../../config";
 
@@ -22,9 +22,12 @@ const CompanyBill = () => {
   useEffect(() => {
     const getCompanyBill = async () => {
       try {
-        const response = await axios.get(config.serverURL + "/harvest/company_bill", {
-          headers: { token: sessionStorage["token"] },
-        });
+        const response = await axios.get(
+          config.serverURL + "/harvest/company_bill",
+          {
+            headers: { token: localStorage["token"] },
+          }
+        );
         const result = response.data;
         setCompanyBill(result.data);
       } catch (error) {
@@ -39,7 +42,7 @@ const CompanyBill = () => {
   };
 
   const filteredData = companyBill.filter(
-    row =>
+    (row) =>
       row.Date.includes(filter) ||
       row.Vehicle_Number.toLowerCase().includes(filter.toLowerCase()) ||
       row.Company_Name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -48,7 +51,7 @@ const CompanyBill = () => {
   );
 
   const getRowBackgroundColor = (index) => {
-    return index % 2 === 0 ? '#f0f0f0' : 'white'; // Alternating row colors
+    return index % 2 === 0 ? "#f0f0f0" : "white"; // Alternating row colors
   };
 
   return (
@@ -98,7 +101,12 @@ const CompanyBill = () => {
                     </TableRow>
                   ) : (
                     filteredData.map((row, index) => (
-                      <TableRow key={index} style={{ backgroundColor: getRowBackgroundColor(index) }}>
+                      <TableRow
+                        key={index}
+                        style={{
+                          backgroundColor: getRowBackgroundColor(index),
+                        }}
+                      >
                         <TableCell>{row.Date}</TableCell>
                         <TableCell>{row.Vehicle_Number}</TableCell>
                         <TableCell>{row.Company_Name}</TableCell>

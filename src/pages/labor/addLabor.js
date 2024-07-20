@@ -2,20 +2,14 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import Input from "../../components/input";
 import Button from "../../components/button";
 import { toast } from "react-toastify";
-import {  useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import config from "../../config";
 import { useNavigate } from "react-router-dom";
-import { MRT_Table, useMaterialReactTable } from 'material-react-table';
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Modal,
-  Typography,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import { MRT_Table, useMaterialReactTable } from "material-react-table";
+import { Box, IconButton, Tooltip, Modal, Typography } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 
 const ManageLabor = () => {
   const [labor_name, setLabor_name] = useState("");
@@ -28,15 +22,15 @@ const ManageLabor = () => {
 
   const navigate = useNavigate();
 
-
-
-
-  useEffect(()=>{
-    const getLabors=async ()=>{
+  useEffect(() => {
+    const getLabors = async () => {
       try {
-        const response = await axios.get(config.serverURL + "/harvest/labours", {
-          headers: { token: sessionStorage["token"] },
-        });
+        const response = await axios.get(
+          config.serverURL + "/harvest/labours",
+          {
+            headers: { token: localStorage["token"] },
+          }
+        );
         const result = response.data.data;
         // console.log(result);
         const laborsWithId = result.map((labor, index) => ({
@@ -44,15 +38,14 @@ const ManageLabor = () => {
           id: labor.labor_id || index + 1, // Use labor_id if exists, otherwise use index as id
         }));
 
-        setLabors(laborsWithId)
+        setLabors(laborsWithId);
         // setLabors(result.data);
       } catch (error) {
         console.log(error);
       }
-    }
+    };
     getLabors();
-
-  })
+  });
   // Redirect to unauthorized page if the user is not an admin
   useEffect(() => {
     console.log(user);
@@ -62,54 +55,71 @@ const ManageLabor = () => {
     }
   }, [user, navigate]);
 
+  //  console.log(labors)
+  const handleDelete = useCallback(
+    async (row) => {
+      console.log("Delete labor with id:", row.index);
+      try {
+        console.log(labors[row.index].labour_mobile);
+        const response = await axios.delete(
+          config.serverURL +
+            `/harvest/labours/${labors[row.index].labour_mobile}`,
+          {
+            headers: { token: localStorage["token"] },
+          }
+        );
+        console.log(response);
+        // console.log(farmers[row.original.id].mobile_no);
+        setLabors((prevLabors) =>
+          prevLabors.filter(
+            (item) => item.labour_mobile !== labors[row.index].labour_mobile
+          )
+        );
 
-//  console.log(labors)
- const handleDelete = useCallback(async (row) => {
-  console.log("Delete labor with id:", row.index);
-  try {
-    console.log((labors[row.index]).labour_mobile);
-    const response = await axios.delete(config.serverURL + `/harvest/labours/${(labors[row.index]).labour_mobile}`, {
-      headers: { token: sessionStorage["token"] },
-    });
-    console.log(response);
-    // console.log(farmers[row.original.id].mobile_no);
-    setLabors(prevLabors => prevLabors.filter(item => item.labour_mobile !== labors[row.index].labour_mobile));
-
-    // Update your state or handle response as needed
-    // setFarmers(response.data);
-  } catch (error) {
-    console.log('Error deleting company:', error);
-  }
-  // Add your delete logic here, for example, make an API call to delete the labor
-},[labors]);
-console.log(labors)
- const openDeleteConfirmModal = useCallback(async (row) => {
-  if (window.confirm('Are you sure you want to delete this labor?')) {
-    handleDelete(row);
-  }
-},[handleDelete]);
-
-  const columns = useMemo(() => [
-    { accessorKey: "id", header: "ID" },
-    { accessorKey: "labour_name", header: "Name" },
-    { accessorKey: "labour_mobile", header: "Mobile" },
-    { accessorKey: "contractor_name", header: "Contractor Name" },
-    {
-      header: "Actions",
-      id: "actions",
-      Cell: ({ row }) => (
-        <Box sx={{ display: 'flex', gap: '1rem' }}>
-          <Tooltip title="Delete">
-            <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      )
+        // Update your state or handle response as needed
+        // setFarmers(response.data);
+      } catch (error) {
+        console.log("Error deleting company:", error);
+      }
+      // Add your delete logic here, for example, make an API call to delete the labor
     },
-  ], [openDeleteConfirmModal]);
+    [labors]
+  );
+  console.log(labors);
+  const openDeleteConfirmModal = useCallback(
+    async (row) => {
+      if (window.confirm("Are you sure you want to delete this labor?")) {
+        handleDelete(row);
+      }
+    },
+    [handleDelete]
+  );
 
-
+  const columns = useMemo(
+    () => [
+      { accessorKey: "id", header: "ID" },
+      { accessorKey: "labour_name", header: "Name" },
+      { accessorKey: "labour_mobile", header: "Mobile" },
+      { accessorKey: "contractor_name", header: "Contractor Name" },
+      {
+        header: "Actions",
+        id: "actions",
+        Cell: ({ row }) => (
+          <Box sx={{ display: "flex", gap: "1rem" }}>
+            <Tooltip title="Delete">
+              <IconButton
+                color="error"
+                onClick={() => openDeleteConfirmModal(row)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ),
+      },
+    ],
+    [openDeleteConfirmModal]
+  );
 
   const dispatch = useDispatch();
 
@@ -122,7 +132,7 @@ console.log(labors)
       toast.error("Enter team contractor");
     } else if (contractor_mobile.length === 0) {
       toast.error("Enter contractor mobile number");
-    }  else {
+    } else {
       const body = {
         labor_name,
         labor_mobile,
@@ -132,7 +142,7 @@ console.log(labors)
       console.log(body);
       axios
         .post(config.serverURL + "/harvest/labours/add", body, {
-          headers: { token: sessionStorage["token"] },
+          headers: { token: localStorage["token"] },
         })
         .then((response) => {
           const result = response.data;
@@ -163,30 +173,30 @@ console.log(labors)
     muiTableBodyRowProps: { hover: false },
     muiTableProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
+        border: "1px solid rgba(81, 81, 81, .5)",
         caption: {
-          captionSide: 'top',
-          fontSize: '1.2rem',
-          fontWeight: 'bold',
+          captionSide: "top",
+          fontSize: "1.2rem",
+          fontWeight: "bold",
         },
       },
     },
     muiTableHeadCellProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        fontStyle: 'italic',
-        fontWeight: 'bold',
-        backgroundColor: '#f0f0f0',
-        color: '#333',
-        padding: '8px',
-        textAlign: 'center',
+        border: "1px solid rgba(81, 81, 81, .5)",
+        fontStyle: "italic",
+        fontWeight: "bold",
+        backgroundColor: "#f0f0f0",
+        color: "#333",
+        padding: "8px",
+        textAlign: "center",
       },
     },
     muiTableBodyCellProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        padding: '8px',
-        textAlign: 'center',
+        border: "1px solid rgba(81, 81, 81, .5)",
+        padding: "8px",
+        textAlign: "center",
       },
     },
     renderCaption: ({ table }) =>
@@ -199,17 +209,17 @@ console.log(labors)
   return (
     <div>
       <Box sx={{ p: 2, maxWidth: 1000, mx: "auto" }}>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
           <Tooltip title="Add Labor">
             <IconButton color="primary" onClick={handleOpen}>
               <AddIcon />
             </IconButton>
           </Tooltip>
         </Box>
-        <Box sx={{ overflowX: 'auto' }}>
-        <MRT_Table table={table} />
+        <Box sx={{ overflowX: "auto" }}>
+          <MRT_Table table={table} />
         </Box>
-        </Box>
+      </Box>
 
       <Modal
         open={open}
@@ -217,17 +227,19 @@ console.log(labors)
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={{ 
-          position: 'absolute', 
-          top: '50%', 
-          left: '50%', 
-          transform: 'translate(-50%, -50%)', 
-          width: 400, 
-          bgcolor: 'background.paper', 
-          border: '2px solid #000', 
-          boxShadow: 24, 
-          p: 4 
-        }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Add Labor
           </Typography>

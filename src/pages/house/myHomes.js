@@ -1,14 +1,14 @@
-import axios from 'axios'
-import config from '../../config'
-import { toast } from 'react-toastify'
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import axios from "axios";
+import config from "../../config";
+import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const MyHomes = () => {
-  const [homes, setHomes] = useState([])
+  const [homes, setHomes] = useState([]);
 
   // hook used to navigate
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // this hooks is called when the value(s) are changed
   // first param: callback function which will be called
@@ -19,64 +19,64 @@ const MyHomes = () => {
   useEffect(() => {
     // user is not yet logged in
     // so send the user to the signin page
-    if (!sessionStorage['token']) {
-      navigate('/signin')
+    if (!localStorage["token"]) {
+      navigate("/signin");
     } else {
       // load all the homes created by the user
-      getMyHomes()
+      getMyHomes();
     }
-  }, [])
+  }, []);
 
   // get my homes
   const getMyHomes = () => {
     axios
-      .get(config.serverURL + '/home/my', {
-        headers: { token: sessionStorage['token'] },
+      .get(config.serverURL + "/home/my", {
+        headers: { token: localStorage["token"] },
       })
       .then((response) => {
-        const result = response.data
+        const result = response.data;
 
-        if (result['status'] === 'success') {
-          console.log(result)
+        if (result["status"] === "success") {
+          console.log(result);
           // set the homes to the state member
-          setHomes(result['data'])
+          setHomes(result["data"]);
         } else {
-          toast.error(result['error'])
+          toast.error(result["error"]);
         }
-      })
-  }
+      });
+  };
 
   // delete my home
   const deleteHome = (id) => {
     axios
-      .delete(config.serverURL + '/home/' + id, {
-        headers: { token: sessionStorage['token'] },
+      .delete(config.serverURL + "/home/" + id, {
+        headers: { token: localStorage["token"] },
       })
       .then((response) => {
-        const result = response.data
-        if (result['status'] === 'success') {
+        const result = response.data;
+        if (result["status"] === "success") {
           // reload the screen
-          getMyHomes()
+          getMyHomes();
         } else {
-          toast.error(result['error'])
+          toast.error(result["error"]);
         }
-      })
-  }
+      });
+  };
 
   // edit my home
   const editHome = (id) => {
     // pass the home id which you want to edit
-    navigate('/edit-home', { state: { homeId: id } })
-  }
+    navigate("/edit-home", { state: { homeId: id } });
+  };
 
   const uploadImage = (id) => {
-    navigate('/upload-image', { state: { homeId: id } })
-  }
+    navigate("/upload-image", { state: { homeId: id } });
+  };
 
   return (
-    <div className='container'>
+    <div className="container">
       <h3 style={styles.h3}>My Homes</h3>
-      <table className='table table-striped'>
+      <table className="table table-striped">
         <thead>
           <tr>
             <th>Id</th>
@@ -100,39 +100,42 @@ const MyHomes = () => {
                   <button
                     onClick={() => uploadImage(home.id)}
                     style={styles.button}
-                    className='btn btn-sm btn-warning'>
+                    className="btn btn-sm btn-warning"
+                  >
                     Upload Image
                   </button>
                   <button
                     onClick={() => editHome(home.id)}
                     style={styles.button}
-                    className='btn btn-sm btn-success'>
+                    className="btn btn-sm btn-success"
+                  >
                     Edit
                   </button>
                   <button
                     onClick={() => deleteHome(home.id)}
                     style={styles.button}
-                    className='btn btn-sm btn-danger'>
+                    className="btn btn-sm btn-danger"
+                  >
                     Delete
                   </button>
                 </td>
               </tr>
-            )
+            );
           })}
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
 const styles = {
   h3: {
-    textAlign: 'center',
+    textAlign: "center",
     margin: 20,
   },
   button: {
     marginRight: 10,
   },
-}
+};
 
-export default MyHomes
+export default MyHomes;

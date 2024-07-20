@@ -12,7 +12,7 @@ import {
   TableRow,
   TextField,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import config from "../../config";
@@ -26,9 +26,12 @@ const FarmerBill = () => {
   useEffect(() => {
     const getFarmerBill = async () => {
       try {
-        const response = await axios.get(config.serverURL + "/harvest/farmer_bill", {
-          headers: { token: sessionStorage["token"] },
-        });
+        const response = await axios.get(
+          config.serverURL + "/harvest/farmer_bill",
+          {
+            headers: { token: localStorage["token"] },
+          }
+        );
         const result = response.data;
         setFarmerBill(result.data);
       } catch (error) {
@@ -50,17 +53,20 @@ const FarmerBill = () => {
     navigate("/paymentDetails");
   };
 
-  const filteredData = farmerBill.length === 0 ? [] : farmerBill.filter(
-    row =>
-      row.Date.includes(filter) ||
-      row.Vehicle_Number.toLowerCase().includes(filter.toLowerCase()) ||
-      row.Company_Name.toLowerCase().includes(filter.toLowerCase()) ||
-      row.LabourTeam_Name.toLowerCase().includes(filter.toLowerCase()) ||
-      row.Farmer_Name.toLowerCase().includes(filter.toLowerCase())
-  );
+  const filteredData =
+    farmerBill.length === 0
+      ? []
+      : farmerBill.filter(
+          (row) =>
+            row.Date.includes(filter) ||
+            row.Vehicle_Number.toLowerCase().includes(filter.toLowerCase()) ||
+            row.Company_Name.toLowerCase().includes(filter.toLowerCase()) ||
+            row.LabourTeam_Name.toLowerCase().includes(filter.toLowerCase()) ||
+            row.Farmer_Name.toLowerCase().includes(filter.toLowerCase())
+        );
 
   const getRowBackgroundColor = (index) => {
-    return index % 2 === 0 ? '#f0f0f0' : 'white'; // Alternating row colors
+    return index % 2 === 0 ? "#f0f0f0" : "white"; // Alternating row colors
   };
 
   return (
@@ -108,13 +114,21 @@ const FarmerBill = () => {
                 <TableBody>
                   {farmerBill.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={showAdditionalColumns ? 12 : 5} align="center">
+                      <TableCell
+                        colSpan={showAdditionalColumns ? 12 : 5}
+                        align="center"
+                      >
                         No records to display
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredData.map((row, index) => (
-                      <TableRow key={index} style={{ backgroundColor: getRowBackgroundColor(index) }}>
+                      <TableRow
+                        key={index}
+                        style={{
+                          backgroundColor: getRowBackgroundColor(index),
+                        }}
+                      >
                         <TableCell>{row.Date}</TableCell>
                         <TableCell>{row.Vehicle_Number}</TableCell>
                         <TableCell>{row.Company_Name}</TableCell>
@@ -147,7 +161,9 @@ const FarmerBill = () => {
                 color="primary"
                 onClick={handleShowAdditionalColumns}
               >
-                {showAdditionalColumns ? "Hide Additional Columns" : "Show Additional Columns"}
+                {showAdditionalColumns
+                  ? "Hide Additional Columns"
+                  : "Show Additional Columns"}
               </Button>
               <Button
                 variant="contained"

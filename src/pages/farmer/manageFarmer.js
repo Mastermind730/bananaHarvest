@@ -5,7 +5,7 @@ import axios from "axios";
 import config from "../../config";
 import { useNavigate } from "react-router-dom";
 import { setSelectedTab } from "../features/handleUser";
-import { MRT_Table, useMaterialReactTable } from 'material-react-table';
+import { MRT_Table, useMaterialReactTable } from "material-react-table";
 import {
   Box,
   Button,
@@ -20,10 +20,10 @@ import {
   DialogTitle,
   Select,
   MenuItem,
-  InputLabel
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+  InputLabel,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ManageFarmer = () => {
   const [date, setDate] = useState("");
@@ -40,7 +40,9 @@ const ManageFarmer = () => {
   const [companyRate, setCompanyRate] = useState("");
   const [companyWastage, setCompanyWastage] = useState("");
   const [extraPayment, setExtraPayment] = useState("");
-  const [boxTypes, setBoxTypes] = useState([{ boxKgType: "", emptyBoxWeight: "", boxCount: "", boxName: "" }]);
+  const [boxTypes, setBoxTypes] = useState([
+    { boxKgType: "", emptyBoxWeight: "", boxCount: "", boxName: "" },
+  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [farmers, setFarmers] = useState([]);
   const user = useSelector((state) => state.authSlice.user.user);
@@ -55,10 +57,13 @@ const ManageFarmer = () => {
   const AddFarmer = () => {
     if (farmerName.length === 0) {
       toast.error("Enter farmer name");
-    } else if (farmerMobile.length === 0 || Number(farmerMobile)<0 || farmerMobile.length!==10) {
+    } else if (
+      farmerMobile.length === 0 ||
+      Number(farmerMobile) < 0 ||
+      farmerMobile.length !== 10
+    ) {
       toast.error("Enter farmer mobile number");
-    } 
-    else if (location.length === 0) {
+    } else if (location.length === 0) {
       toast.error("Enter farmer location ");
     } else {
       const body = {
@@ -81,13 +86,13 @@ const ManageFarmer = () => {
 
       axios
         .post(config.serverURL + "/harvest/farmers/add", body, {
-          headers: { token: sessionStorage["token"] },
+          headers: { token: localStorage["token"] },
         })
         .then((response) => {
           const result = response.data;
           console.log(result);
           if (result["status"] === "success") {
-            setIsModalOpen(false)
+            setIsModalOpen(false);
             toast.success("Successfully added a new farmer");
             navigate("/manageFarmer");
           } else {
@@ -103,9 +108,12 @@ const ManageFarmer = () => {
   useEffect(() => {
     const getFarmers = async () => {
       try {
-        const response = await axios.get(config.serverURL + "/harvest/farmers", {
-          headers: { token: sessionStorage["token"] },
-        });
+        const response = await axios.get(
+          config.serverURL + "/harvest/farmers",
+          {
+            headers: { token: localStorage["token"] },
+          }
+        );
         const { data } = response.data;
         setFarmers(data);
       } catch (error) {
@@ -114,7 +122,7 @@ const ManageFarmer = () => {
     };
     getFarmers();
   }, []);
-  console.log(farmers)
+  console.log(farmers);
 
   // Redirect to unauthorized page if the user is not an admin
   useEffect(() => {
@@ -124,50 +132,65 @@ const ManageFarmer = () => {
       navigate("/home");
     }
   }, [user, navigate]);
-  
-  const openDeleteConfirmModal = useCallback(async (row) => {
-    // if (window.confirm('Are you sure you want to delete this farmer?')) {
-      
+
+  const openDeleteConfirmModal = useCallback(
+    async (row) => {
+      // if (window.confirm('Are you sure you want to delete this farmer?')) {
 
       try {
-        console.log((farmers[row.index]).mobile_no);
-        const response = await axios.get(config.serverURL + `/harvest/farmers/${(farmers[row.index]).mobile_no}`, {
-          headers: { token: sessionStorage["token"] },
-        });
+        console.log(farmers[row.index].mobile_no);
+        const response = await axios.get(
+          config.serverURL + `/harvest/farmers/${farmers[row.index].mobile_no}`,
+          {
+            headers: { token: localStorage["token"] },
+          }
+        );
         console.log(response);
         // console.log(farmers[row.original.id].mobile_no);
-        setFarmers(prevFarmers => prevFarmers.filter(farmer => farmer.mobile_no !== (farmers[row.index]).mobile_no));
+        setFarmers((prevFarmers) =>
+          prevFarmers.filter(
+            (farmer) => farmer.mobile_no !== farmers[row.index].mobile_no
+          )
+        );
 
         // Update your state or handle response as needed
         // setFarmers(response.data);
       } catch (error) {
-        console.log('Error deleting farmer:', error);
+        console.log("Error deleting farmer:", error);
       }
-    // }
-  }, [farmers]);
-
-  const columns = useMemo(() => [
-    { accessorKey: "farmer_name", header: "Farmer Name" },
-    { accessorKey: "mobile_no", header: "Farmer Mobile" },
-    { accessorKey: "location", header: "Location" },
-    {
-      accessorKey: "delete",
-      header: "Delete",
-      Cell: ({ row }) => (
-        <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
-          <DeleteIcon />
-        </IconButton>
-      ),
+      // }
     },
-  ], [openDeleteConfirmModal]);
+    [farmers]
+  );
+
+  const columns = useMemo(
+    () => [
+      { accessorKey: "farmer_name", header: "Farmer Name" },
+      { accessorKey: "mobile_no", header: "Farmer Mobile" },
+      { accessorKey: "location", header: "Location" },
+      {
+        accessorKey: "delete",
+        header: "Delete",
+        Cell: ({ row }) => (
+          <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
+            <DeleteIcon />
+          </IconButton>
+        ),
+      },
+    ],
+    [openDeleteConfirmModal]
+  );
 
   const handleAddBoxType = () => {
-    setBoxTypes([...boxTypes, { boxKgType: "", emptyBoxWeight: "", boxCount: "", boxName: "" }]);
+    setBoxTypes([
+      ...boxTypes,
+      { boxKgType: "", emptyBoxWeight: "", boxCount: "", boxName: "" },
+    ]);
   };
 
   const handleRemoveBoxType = (index) => {
     const newBoxTypes = [...boxTypes];
-    
+
     newBoxTypes.splice(index, 1);
     setBoxTypes(newBoxTypes);
   };
@@ -179,12 +202,13 @@ const ManageFarmer = () => {
   };
 
   const handleModalOpen = () => {
-    setBoxTypes([{ boxKgType: "", emptyBoxWeight: "", boxCount: "", boxName: "" }]);
+    setBoxTypes([
+      { boxKgType: "", emptyBoxWeight: "", boxCount: "", boxName: "" },
+    ]);
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
-    
     setIsModalOpen(false);
   };
 
@@ -201,30 +225,30 @@ const ManageFarmer = () => {
     muiTableBodyRowProps: { hover: false },
     muiTableProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
+        border: "1px solid rgba(81, 81, 81, .5)",
         caption: {
-          captionSide: 'top',
-          fontSize: '1.2rem',
-          fontWeight: 'bold',
+          captionSide: "top",
+          fontSize: "1.2rem",
+          fontWeight: "bold",
         },
       },
     },
     muiTableHeadCellProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        fontStyle: 'italic',
-        fontWeight: 'bold',
-        backgroundColor: '#f0f0f0',
-        color: '#333',
-        padding: '8px',
-        textAlign: 'center',
+        border: "1px solid rgba(81, 81, 81, .5)",
+        fontStyle: "italic",
+        fontWeight: "bold",
+        backgroundColor: "#f0f0f0",
+        color: "#333",
+        padding: "8px",
+        textAlign: "center",
       },
     },
     muiTableBodyCellProps: {
       sx: {
-        border: '1px solid rgba(81, 81, 81, .5)',
-        padding: '8px',
-        textAlign: 'center',
+        border: "1px solid rgba(81, 81, 81, .5)",
+        padding: "8px",
+        textAlign: "center",
       },
     },
     renderCaption: ({ table }) =>
@@ -243,7 +267,12 @@ const ManageFarmer = () => {
         </Button>
       </Box>
 
-      <Dialog open={isModalOpen} onClose={handleModalClose} fullWidth maxWidth="md">
+      <Dialog
+        open={isModalOpen}
+        onClose={handleModalClose}
+        fullWidth
+        maxWidth="md"
+      >
         <DialogTitle>Add Farmer</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
@@ -257,17 +286,17 @@ const ManageFarmer = () => {
               />
             </Grid>
             <Grid item xs={6}>
-  <TextField
-    fullWidth
-    label="Location"
-    required
-    InputLabelProps={{
-      shrink: true,
-      style: { color: 'red' }, // Change label color to red
-    }}
-    onChange={(e) => setLocation(e.target.value)}
-  />
-</Grid>
+              <TextField
+                fullWidth
+                label="Location"
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: { color: "red" }, // Change label color to red
+                }}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+            </Grid>
 
             <Grid item xs={6}>
               <TextField
@@ -282,7 +311,7 @@ const ManageFarmer = () => {
                 label="Farmer Name"
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setFarmerName(e.target.value)}
               />
@@ -293,7 +322,7 @@ const ManageFarmer = () => {
                 label="Farmer Mobile No"
                 InputLabelProps={{
                   shrink: true,
-                  style: { color: 'red' }, // Change label color to red
+                  style: { color: "red" }, // Change label color to red
                 }}
                 onChange={(e) => setFarmerMobile(e.target.value)}
               />
@@ -362,96 +391,123 @@ const ManageFarmer = () => {
               />
             </Grid>
             {boxTypes.map((boxType, index) => (
-  <React.Fragment key={index}>
-    <Grid item xs={6}>
-      <InputLabel htmlFor={`boxKgType-${index}`}>Box</InputLabel>
-      <Select
-        fullWidth
-        value={boxType.boxKgType}
-        onChange={(e) => handleBoxTypeChange(index, 'boxKgType', e.target.value)}
-        inputProps={{
-          id: `boxKgType-${index}`,
-        }}
-      >
-        <MenuItem value=""><em>None</em></MenuItem>
-        <MenuItem value="3">3</MenuItem>
-        <MenuItem value="5">5</MenuItem>
-        <MenuItem value="7">7</MenuItem>
-        <MenuItem value="13">13</MenuItem>
-        <MenuItem value="13.5">13.5</MenuItem>
-        <MenuItem value="14">14</MenuItem>
-        <MenuItem value="16">16</MenuItem>
-        <MenuItem value="18">18</MenuItem>
-        <MenuItem value="custom">Custom</MenuItem>
-      </Select>
-    </Grid>
-    {boxType.boxKgType && boxType.boxKgType !== 'custom' && (
-      <>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Count"
-            value={boxType.boxCount}
-            onChange={(e) => handleBoxTypeChange(index, 'boxCount', e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Name"
-            value={boxType.boxName}
-            onChange={(e) => handleBoxTypeChange(index, 'boxName', e.target.value)}
-          />
-        </Grid>
-      </>
-    )}
-    {boxType.boxKgType === 'custom' && (
-      <>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Kg Type"
-            value={boxType.boxKgType}
-            onChange={(e) => handleBoxTypeChange(index, 'boxKgType', e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Empty Box Weight"
-            value={boxType.emptyBoxWeight}
-            onChange={(e) => handleBoxTypeChange(index, 'emptyBoxWeight', e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Count"
-            value={boxType.boxCount}
-            onChange={(e) => handleBoxTypeChange(index, 'boxCount', e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Box Name"
-            value={boxType.boxName}
-            onChange={(e) => handleBoxTypeChange(index, 'boxName', e.target.value)}
-          />
-        </Grid>
-      </>
-    )}
-    {index > 0 && (
-      <Grid item xs={6}>
-        <Tooltip title="Remove this box">
-          <IconButton color="secondary" onClick={() => handleRemoveBoxType(index)}>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      </Grid>
-    )}
-  </React.Fragment>
-))}
+              <React.Fragment key={index}>
+                <Grid item xs={6}>
+                  <InputLabel htmlFor={`boxKgType-${index}`}>Box</InputLabel>
+                  <Select
+                    fullWidth
+                    value={boxType.boxKgType}
+                    onChange={(e) =>
+                      handleBoxTypeChange(index, "boxKgType", e.target.value)
+                    }
+                    inputProps={{
+                      id: `boxKgType-${index}`,
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    <MenuItem value="3">3</MenuItem>
+                    <MenuItem value="5">5</MenuItem>
+                    <MenuItem value="7">7</MenuItem>
+                    <MenuItem value="13">13</MenuItem>
+                    <MenuItem value="13.5">13.5</MenuItem>
+                    <MenuItem value="14">14</MenuItem>
+                    <MenuItem value="16">16</MenuItem>
+                    <MenuItem value="18">18</MenuItem>
+                    <MenuItem value="custom">Custom</MenuItem>
+                  </Select>
+                </Grid>
+                {boxType.boxKgType && boxType.boxKgType !== "custom" && (
+                  <>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Box Count"
+                        value={boxType.boxCount}
+                        onChange={(e) =>
+                          handleBoxTypeChange(index, "boxCount", e.target.value)
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Box Name"
+                        value={boxType.boxName}
+                        onChange={(e) =>
+                          handleBoxTypeChange(index, "boxName", e.target.value)
+                        }
+                      />
+                    </Grid>
+                  </>
+                )}
+                {boxType.boxKgType === "custom" && (
+                  <>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Box Kg Type"
+                        value={boxType.boxKgType}
+                        onChange={(e) =>
+                          handleBoxTypeChange(
+                            index,
+                            "boxKgType",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Empty Box Weight"
+                        value={boxType.emptyBoxWeight}
+                        onChange={(e) =>
+                          handleBoxTypeChange(
+                            index,
+                            "emptyBoxWeight",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Box Count"
+                        value={boxType.boxCount}
+                        onChange={(e) =>
+                          handleBoxTypeChange(index, "boxCount", e.target.value)
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Box Name"
+                        value={boxType.boxName}
+                        onChange={(e) =>
+                          handleBoxTypeChange(index, "boxName", e.target.value)
+                        }
+                      />
+                    </Grid>
+                  </>
+                )}
+                {index > 0 && (
+                  <Grid item xs={6}>
+                    <Tooltip title="Remove this box">
+                      <IconButton
+                        color="secondary"
+                        onClick={() => handleRemoveBoxType(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                )}
+              </React.Fragment>
+            ))}
 
             <Grid item xs={12}>
               <Tooltip title="Add more boxes">
@@ -472,7 +528,7 @@ const ManageFarmer = () => {
         </DialogActions>
       </Dialog>
 
-      <Box mt={3} sx={{ overflowX: 'auto' }}>
+      <Box mt={3} sx={{ overflowX: "auto" }}>
         <MRT_Table table={table} />
       </Box>
     </div>

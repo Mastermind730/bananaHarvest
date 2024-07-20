@@ -44,6 +44,8 @@ const Signin = () => {
           } else {
             // get the logged in user's info
             const user = result['data']
+            console.log(user.user);
+            console.log(user.token);
 
             // send the action
             dispatch(signin(user))
